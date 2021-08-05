@@ -8,7 +8,7 @@ admin.initializeApp(functions.config().firebase);
 const USER_LIST = ["fnobi"];
 
 exports.scheduleFetchFollowers = functions.pubsub
-    .schedule("every 5 minutes")
+    .schedule("every 1 hours")
     .onRun(async () => {
       const client = new TwitterApiClient(TWITTER_BEARER_TOKEN);
       await Promise.all(USER_LIST.map(async (name) => {
