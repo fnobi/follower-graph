@@ -1,14 +1,55 @@
 {
   "name": "follower-graph",
   "version": "1.0.0",
-  "description": "",
+  "description": "Awsome next.js project.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "next",
+    "build": "next build && next export && node scripts/make-dist-dir",
+    "lint": "eslint --ext .ts,.tsx,.js --fix ."
   },
+  "keywords": [],
   "author": "Fujisawa Shin",
   "license": "ISC",
   "devDependencies": {
-    "firebase-tools": "^9.16.0"
-  }
+    "@babel/core": "^7.13.10",
+    "@emotion/babel-preset-css-prop": "^11.2.0",
+    "@types/node": "^12.6.2",
+    "@types/react": "^16.8.23",
+    "@types/recoil": "0.0.1",
+    "@typescript-eslint/eslint-plugin": "^4.27.0",
+    "@typescript-eslint/parser": "^4.27.0",
+    "@zeit/next-typescript": "^1.1.1",
+    "babel-plugin-module-resolver": "^3.2.0",
+    "eslint": "^7.28.0",
+    "eslint-config-airbnb": "^17.1.1",
+    "eslint-config-next": "^11.0.0",
+    "eslint-config-prettier": "^6.0.0",
+    "eslint-plugin-import": "^2.20.1",
+    "eslint-plugin-jsx-a11y": "^6.2.3",
+    "eslint-plugin-prettier": "^3.1.0",
+    "eslint-plugin-react": "^7.14.2",
+    "eslint-plugin-react-hooks": "^1.6.1",
+    "file-loader": "^6.0.0",
+    "firebase-tools": "^9.16.0",
+    "prettier": "^1.18.2",
+    "react-dom": "^17.0.2",
+    "typescript": "~4.3.2"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.4.0",
+    "css-transform-builder": "^1.0.0",
+    "emotion-reset": "~3.0.0",
+    "next": "^11.0.0",
+    "react": "^17.0.2",
+    "recoil": "0.0.10"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fnobi/follower-graph.git"
+  },
+  "bugs": {
+    "url": "https://github.com/fnobi/follower-graph/issues"
+  },
+  "homepage": "https://github.com/fnobi/follower-graph#readme"
 }

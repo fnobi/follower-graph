@@ -1,0 +1,90 @@
+{
+  "extends": ["airbnb", "plugin:prettier/recommended", "next"],
+  "plugins": ["@typescript-eslint"],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "sourceType": "module",
+    "project": "./tsconfig.json"
+  },
+  "root": true,
+  "rules": {
+    "arrow-parens": [2, "as-needed"],
+    "curly": [1, "all"],
+    "no-unused-vars": 0,
+    "@next/next/no-page-custom-font": 0,
+    "@next/next/no-html-link-for-pages": 0,
+    "@typescript-eslint/explicit-member-accessibility": 2,
+    "@typescript-eslint/no-unnecessary-type-assertion": 2,
+    "@typescript-eslint/no-explicit-any": 2,
+    "@typescript-eslint/no-unused-vars": 2,
+    "prefer-arrow/prefer-arrow-functions": 0,
+    "react/jsx-filename-extension": [
+      1,
+      { "extensions": [".js", ".jsx", ".tsx"] }
+    ],
+    "react-hooks/rules-of-hooks": 2,
+    "import/no-duplicates": 0,
+    "import/no-unresolved": 0,
+    "import/extensions": 0,
+    "import/order": ["error", {
+      "groups": [
+        "builtin",
+        "external",
+        "internal",
+        "parent",
+        "sibling",
+        "index"
+      ],
+      "pathGroups": [
+        {
+          "pattern": "~/lib/**",
+          "group": "external"
+        },
+        {
+          "pattern": "~/local/**",
+          "group": "internal"
+        },
+        {
+          "pattern": "~/scheme/**",
+          "group": "parent"
+        },
+        {
+          "pattern": "~/store/**",
+          "group": "sibling"
+        },
+        {
+          "pattern": "~/components/**",
+          "group": "index"
+        }
+      ]
+    }],    
+    "no-undef": 1,
+    "react/no-array-index-key": 0,
+    "prettier/prettier": 1,
+    "jsx-a11y/label-has-associated-control": [2, {"assert": "either"}],
+    "jsx-a11y/label-has-for": 0,
+    "import/prefer-default-export": 1,
+    "import/no-extraneous-dependencies": 1,
+    "react/jsx-one-expression-per-line": 0,
+    "react/jsx-indent-props": 1,
+    "react/jsx-closing-bracket-location": 1,
+    "react/jsx-closing-tag-location": 1,
+    "react/jsx-indent" : 1,
+    "react/no-unescaped-entities": 0,
+    "react/prop-types": 0,
+    "react/react-in-jsx-scope": 0,
+    "no-shadow": 1,
+    "no-param-reassign" : 1
+  },
+  "globals": {
+    "window": true,
+    "document": true,
+    "location": true
+  },
+  "env": {
+    "jest": true
+  }
+}
