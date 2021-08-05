@@ -1,21 +1,12 @@
-import { useState, useEffect } from "react";
+import firebase from "firebase/app";
+import { useEffect, useState } from "react";
 import { css } from "@emotion/react";
-import { px, percent } from "~/lib/cssUtil";
-import { firebaseFirestore } from "~/local/firebaseApp";
+import { em, percent } from "~/lib/cssUtil";
+import { firebaseAuth } from "~/local/firebaseApp";
+import GraphView from "~/components/GraphView";
 
-type TwitterData = {
-  createdAt: number;
-  followersCount: number;
-  friendsCount: number;
-};
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const parseTwitterData = (src: any): TwitterData => {
-  return {
-    createdAt: Number(src.createdAt || 0),
-    followersCount: Number(src.followersCount || 0),
-    friendsCount: Number(src.friendsCount || 0)
-  };
+type UserInfo = {
+  id: string;
 };
 
 const wrapperStyle = css({
@@ -24,34 +15,48 @@ const wrapperStyle = css({
   alignItems: "center",
   justifyContent: "center",
   flexDirection: "column",
-  top: px(0),
-  left: px(0),
+  top: percent(0),
+  left: percent(0),
   width: percent(100),
   height: percent(100)
 });
 
+const footerStyle = css({
+  position: "fixed",
+  bottom: em(1),
+  right: em(1)
+});
+
 const PageIndex = () => {
-  const [list, setList] = useState<TwitterData[]>([]);
+  const [user, setUser] = useState<UserInfo | null>(null);
 
   useEffect(() => {
-    firebaseFirestore()
-      .collection("fnobi")
-      .limit(100)
-      .orderBy("createdAt", "desc")
-      .onSnapshot(snapshot => {
-        setList(snapshot.docs.map(s => parseTwitterData(s.data())));
-      });
+    firebaseAuth().onAuthStateChanged(u => setUser(u ? { id: u.uid } : null));
   }, []);
 
-  return (
+  const signIn = () => {
+    const p = new firebase.auth.GoogleAuthProvider();
+    firebaseAuth().signInWithPopup(p);
+  };
+
+  const signOut = () => {
+    firebaseAuth().signOut();
+  };
+
+  return user ? (
+    <div>
+      <GraphView myId={user.id} />
+      <div css={footerStyle}>
+        <button type="button" onClick={signOut}>
+          logout
+        </button>
+      </div>
+    </div>
+  ) : (
     <div css={wrapperStyle}>
-      {list.map(item => (
-        <p key={item.createdAt}>
-          {new Date(item.createdAt).toString()}
-          <br />
-          {item.followersCount}
-        </p>
-      ))}
+      <button type="button" onClick={signIn}>
+        login
+      </button>
     </div>
   );
 };
