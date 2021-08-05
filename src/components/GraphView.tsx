@@ -1,5 +1,5 @@
 import dynamic from "next/dynamic";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { css } from "@emotion/react";
 import { px, percent } from "~/lib/cssUtil";
 import { firebaseFirestore } from "~/local/firebaseApp";
@@ -38,6 +38,22 @@ const wrapperStyle = css({
   textAlign: "center"
 });
 
+const GraphTableRow = (props: { item: TwitterData }) => {
+  const { item } = props;
+  const dateString = useMemo(() => {
+    const d = new Date(item.createdAt);
+    return [
+      [d.getFullYear(), d.getMonth() + 1, d.getDate()].join("-"),
+      [d.getHours(), d.getMinutes()].join(":")
+    ].join(" ");
+  }, [item.createdAt]);
+  return (
+    <p>
+      {dateString}&nbsp;[{item.followersCount}]
+    </p>
+  );
+};
+
 const GraphView = (props: { myId: string }) => {
   const { myId } = props;
   const [list, setList] = useState<TwitterData[]>([]);
@@ -59,11 +75,7 @@ const GraphView = (props: { myId: string }) => {
       <SampleCanvasElementView />
       <div css={wrapperStyle}>
         {list.map(item => (
-          <p key={item.createdAt}>
-            {new Date(item.createdAt).toString()}
-            <br />
-            {item.followersCount}
-          </p>
+          <GraphTableRow key={item.createdAt} item={item} />
         ))}
       </div>
     </>
