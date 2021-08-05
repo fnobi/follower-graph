@@ -1,8 +1,22 @@
-import { useState, MouseEvent } from "react";
-import Link from "next/link";
+import { useState, useEffect } from "react";
 import { css } from "@emotion/react";
-import { px, percent, em } from "~/lib/cssUtil";
-import { useSampleCounter } from "~/store/sample";
+import { px, percent } from "~/lib/cssUtil";
+import { firebaseFirestore } from "~/local/firebaseApp";
+
+type TwitterData = {
+  createdAt: number;
+  followersCount: number;
+  friendsCount: number;
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const parseTwitterData = (src: any): TwitterData => {
+  return {
+    createdAt: Number(src.createdAt || 0),
+    followersCount: Number(src.followersCount || 0),
+    friendsCount: Number(src.friendsCount || 0)
+  };
+};
 
 const wrapperStyle = css({
   position: "fixed",
@@ -16,31 +30,28 @@ const wrapperStyle = css({
   height: percent(100)
 });
 
-const titleStyle = css({
-  fontWeight: "bold",
-  marginBottom: em(0.5)
-});
-
 const PageIndex = () => {
-  const [mouse, setMouse] = useState<[number, number]>([0, 0]);
-  const [count, increment] = useSampleCounter();
+  const [list, setList] = useState<TwitterData[]>([]);
 
-  const updateMouse = (e: MouseEvent) => {
-    setMouse([e.pageX, e.pageY]);
-  };
+  useEffect(() => {
+    firebaseFirestore()
+      .collection("fnobi")
+      .limit(100)
+      .orderBy("createdAt", "desc")
+      .onSnapshot(snapshot => {
+        setList(snapshot.docs.map(s => parseTwitterData(s.data())));
+      });
+  }, []);
 
   return (
-    <div css={wrapperStyle} onMouseMove={updateMouse}>
-      <div css={titleStyle}>Welcome to Next.js!</div>
-      <button type="button" onClick={increment}>
-        count up:{count}
-      </button>
-      <p>
-        <Link href="/about">
-          <a href="/about">about</a>
-        </Link>
-      </p>
-      <p>{mouse.join(",")}</p>
+    <div css={wrapperStyle}>
+      {list.map(item => (
+        <p key={item.createdAt}>
+          {new Date(item.createdAt).toString()}
+          <br />
+          {item.followersCount}
+        </p>
+      ))}
     </div>
   );
 };
