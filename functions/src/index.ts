@@ -5,16 +5,20 @@ import TwitterApiClient from "./local/TwitterApiClient";
 
 admin.initializeApp(functions.config().firebase);
 
-const USER_LIST = ["fnobi"];
-
 exports.scheduleFetchFollowers = functions.pubsub
-    .schedule("every 1 hours")
+    .schedule("every 5 minutes")
     .onRun(async () => {
       const client = new TwitterApiClient(TWITTER_BEARER_TOKEN);
-      await Promise.all(USER_LIST.map(async (name) => {
+      const rootRef = admin.firestore().collection("users");
+      const users = await rootRef.get();
+      await Promise.all(users.docs.map(async (snapshot) => {
+        const {twitter: name} = snapshot.data();
+        if (!name) {
+          return;
+        }
         const res = await client.showUser(name);
         const d = new Date();
-        await admin.firestore().collection(name).doc().set({
+        await rootRef.doc(name).collection("log").doc().set({
           createdAt: d.getTime(),
           followersCount: res.followers_count,
           friendsCount: res.friends_count,
