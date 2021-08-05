@@ -27,5 +27,5 @@ exports.scheduleFetchFollowers = functions.pubsub
     .schedule("every 5 minutes")
     .onRun(async () => {
       const res = await searchRecentTweet("from:twitterdev");
-      console.log(res);
+      console.log(JSON.stringify(res));
     });
