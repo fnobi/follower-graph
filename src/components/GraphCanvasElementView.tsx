@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { css } from "@emotion/react";
 import { percent } from "~/lib/cssUtil";
 import useCanvasAgent from "~/lib/useCanvasAgent";
+import Dragger from "~/lib/Dragger";
 import GraphCanvasElementPlayer from "~/local/GraphCanvasElementPlayer";
 import { TwitterData } from "~/scheme/TwitterData";
 
@@ -23,32 +24,51 @@ const canvasStyle = css({
 const GraphCanvasElementView = (props: {
   list: TwitterData[];
   twitterName: string;
-  scroll: number;
 }) => {
-  const { list, twitterName, scroll } = props;
+  const { list, twitterName } = props;
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const { playerRef } = useCanvasAgent({
     initializer: () => new GraphCanvasElementPlayer(),
     wrapperRef
   });
+
+  useEffect(() => {
+    const { current: wrapper } = wrapperRef;
+    if (!wrapper) {
+      return () => {};
+    }
+    const dragger = new Dragger({
+      els: [wrapper],
+      onMove: ({ x, y }) => {
+        const { current: player } = playerRef;
+        if (player) {
+          player.scrollBy((-y + x) * 0.0002);
+        }
+      },
+      wheelHandler: (e: WheelEvent) => ({
+        x: 0,
+        y: -e.deltaY * 0.3,
+        z: 0
+      }),
+      preventDefault: true
+    });
+    return () => dragger.destroy();
+  }, []);
+
   useEffect(() => {
     const { current: player } = playerRef;
     if (player) {
       player.setList(list);
     }
   }, [list]);
+
   useEffect(() => {
     const { current: player } = playerRef;
     if (player) {
       player.setTwitterName(twitterName);
     }
   }, [twitterName]);
-  useEffect(() => {
-    const { current: player } = playerRef;
-    if (player) {
-      player.setScroll(scroll);
-    }
-  }, [scroll]);
+
   return <div css={canvasStyle} ref={wrapperRef} />;
 };
 

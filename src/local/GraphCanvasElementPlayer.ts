@@ -1,5 +1,5 @@
 import { CanvasPlayer } from "~/lib/useCanvasAgent";
-import { minBy, maxBy, mix, padLeft } from "~/lib/lodashLike";
+import { minBy, maxBy, mix, padLeft, clamp } from "~/lib/lodashLike";
 import { TwitterData } from "~/scheme/TwitterData";
 
 const VIEWPORT = 450;
@@ -42,7 +42,11 @@ export default class GraphCanvasElementPlayer implements CanvasPlayer {
   }
 
   public setScroll(num: number) {
-    this.scroll = num;
+    this.scroll = clamp(0, 1, num);
+  }
+
+  public scrollBy(delta: number) {
+    this.setScroll(this.scroll + delta);
   }
 
   private render() {
@@ -72,8 +76,7 @@ export default class GraphCanvasElementPlayer implements CanvasPlayer {
         const y = Math.sin(a) * size;
         return { x, y };
       });
-      const focusIndex =
-        Math.round(scroll * (this.list.length - 1)) % this.list.length;
+      const focusIndex = Math.round(scroll * (this.list.length - 1));
       const focusItem = this.list[focusIndex];
 
       ctx.beginPath();

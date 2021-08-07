@@ -1,7 +1,5 @@
-import { css } from "@emotion/react";
 import dynamic from "next/dynamic";
 import { useState, useEffect } from "react";
-import { px, vh } from "~/lib/cssUtil";
 import { firebaseFirestore } from "~/local/firebaseApp";
 import { parseTwitterData, TwitterData } from "~/scheme/TwitterData";
 
@@ -10,29 +8,10 @@ const GraphCanvasElementView = dynamic(
   { ssr: false }
 );
 
-const spacerStyle = css({
-  paddingTop: vh(100),
-  height: px(3000)
-});
-
 const GraphView = (props: { myId: string }) => {
   const { myId } = props;
   const [twitterName, setTwitterName] = useState("");
   const [list, setList] = useState<TwitterData[]>([]);
-  const [scroll, setScroll] = useState(0);
-
-  useEffect(() => {
-    const handler = () => {
-      const el = window.document.scrollingElement;
-      if (el) {
-        const y = el.scrollTop;
-        const val = y / (el.scrollHeight - window.innerHeight);
-        setScroll(val);
-      }
-    };
-    window.addEventListener("scroll", handler);
-    return () => window.removeEventListener("scroll", handler);
-  }, []);
 
   useEffect(() => {
     return firebaseFirestore()
@@ -56,16 +35,7 @@ const GraphView = (props: { myId: string }) => {
       });
   }, [myId]);
 
-  return (
-    <>
-      <div css={spacerStyle} />
-      <GraphCanvasElementView
-        list={list}
-        twitterName={twitterName}
-        scroll={scroll}
-      />
-    </>
-  );
+  return <GraphCanvasElementView list={list} twitterName={twitterName} />;
 };
 
 export default GraphView;
