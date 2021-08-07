@@ -1,5 +1,5 @@
 import { FormEvent, useState } from "react";
-import { firebaseFirestore } from "~/local/firebaseApp";
+import { usersDocumentRef } from "~/local/database";
 
 const NewAccountForm = (props: { myId: string }) => {
   const { myId } = props;
@@ -9,10 +9,7 @@ const NewAccountForm = (props: { myId: string }) => {
     if (!account || !myId) {
       return;
     }
-    firebaseFirestore()
-      .collection("users")
-      .doc(myId)
-      .set({ twitter: account });
+    usersDocumentRef(myId).set({ twitter: account });
   };
   return (
     <form onSubmit={handleSubmit}>

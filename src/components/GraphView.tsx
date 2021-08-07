@@ -2,6 +2,7 @@ import { css } from "@emotion/react";
 import dynamic from "next/dynamic";
 import { useState, useEffect } from "react";
 import { em, percent } from "~/lib/cssUtil";
+import { usersDocumentRef, usersLogCollectionRef } from "~/local/database";
 import { firebaseAuth, firebaseFirestore } from "~/local/firebaseApp";
 import { parseTwitterData, TwitterData } from "~/scheme/TwitterData";
 import NewAccountForm from "./NewAccountForm";
@@ -46,10 +47,7 @@ const GraphView = (props: { myId: string }) => {
   };
 
   useEffect(() => {
-    return firebaseFirestore()
-      .collection("users")
-      .doc(myId)
-      .collection("log")
+    return usersLogCollectionRef(myId)
       .limit(100)
       .orderBy("createdAt", "desc")
       .onSnapshot(snapshot => {
@@ -58,13 +56,10 @@ const GraphView = (props: { myId: string }) => {
   }, [myId]);
 
   useEffect(() => {
-    return firebaseFirestore()
-      .collection("users")
-      .doc(myId)
-      .onSnapshot(snapshot => {
-        const d = snapshot.data();
-        setTwitterName(d ? d.twitter : "");
-      });
+    return usersDocumentRef(myId).onSnapshot(snapshot => {
+      const d = snapshot.data();
+      setTwitterName(d ? d.twitter : "");
+    });
   }, [myId]);
 
   return (
