@@ -2,26 +2,12 @@ import dynamic from "next/dynamic";
 import { useState, useEffect, useMemo } from "react";
 import { css } from "@emotion/react";
 import { firebaseFirestore } from "~/local/firebaseApp";
+import { parseTwitterData, TwitterData } from "~/scheme/TwitterData";
 
 const SampleCanvasElementView = dynamic(
   () => import("~/components/SampleCanvasElementView"),
   { ssr: false }
 );
-
-type TwitterData = {
-  createdAt: number;
-  followersCount: number;
-  friendsCount: number;
-};
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const parseTwitterData = (src: any): TwitterData => {
-  return {
-    createdAt: Number(src.createdAt || 0),
-    followersCount: Number(src.followersCount || 0),
-    friendsCount: Number(src.friendsCount || 0)
-  };
-};
 
 const wrapperStyle = css({
   position: "relative",
