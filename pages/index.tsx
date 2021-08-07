@@ -1,7 +1,7 @@
 import firebase from "firebase/app";
 import { useEffect, useState } from "react";
 import { css } from "@emotion/react";
-import { em, percent } from "~/lib/cssUtil";
+import { percent } from "~/lib/cssUtil";
 import { firebaseAuth } from "~/local/firebaseApp";
 import GraphView from "~/components/GraphView";
 
@@ -21,12 +21,6 @@ const wrapperStyle = css({
   height: percent(100)
 });
 
-const footerStyle = css({
-  position: "fixed",
-  bottom: em(1),
-  right: em(1)
-});
-
 const PageIndex = () => {
   const [user, setUser] = useState<UserInfo | null>(null);
 
@@ -39,19 +33,8 @@ const PageIndex = () => {
     firebaseAuth().signInWithPopup(p);
   };
 
-  const signOut = () => {
-    firebaseAuth().signOut();
-  };
-
   return user ? (
-    <div>
-      <GraphView myId={user.id} />
-      <div css={footerStyle}>
-        <button type="button" onClick={signOut}>
-          logout
-        </button>
-      </div>
-    </div>
+    <GraphView myId={user.id} />
   ) : (
     <div css={wrapperStyle}>
       <button type="button" onClick={signIn}>
