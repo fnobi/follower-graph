@@ -4,8 +4,8 @@ import { css } from "@emotion/react";
 import { firebaseFirestore } from "~/local/firebaseApp";
 import { parseTwitterData, TwitterData } from "~/scheme/TwitterData";
 
-const SampleCanvasElementView = dynamic(
-  () => import("~/components/SampleCanvasElementView"),
+const GraphCanvasElementView = dynamic(
+  () => import("~/components/GraphCanvasElementView"),
   { ssr: false }
 );
 
@@ -53,7 +53,7 @@ const GraphView = (props: { myId: string }) => {
 
   return (
     <>
-      <SampleCanvasElementView />
+      <GraphCanvasElementView list={list} />
       <div css={wrapperStyle}>
         {list.map(item => (
           <GraphTableRow key={item.createdAt} item={item} />
