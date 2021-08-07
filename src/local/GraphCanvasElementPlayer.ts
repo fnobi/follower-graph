@@ -1,7 +1,6 @@
 import { CanvasPlayer } from "~/lib/useCanvasAgent";
+import { minBy, maxBy, mix } from "~/lib/lodashLike";
 import { TwitterData } from "~/scheme/TwitterData";
-
-const RECT_SIZE = 100;
 
 export default class GraphCanvasElementPlayer implements CanvasPlayer {
   public readonly canvas: HTMLCanvasElement;
@@ -28,17 +27,54 @@ export default class GraphCanvasElementPlayer implements CanvasPlayer {
     if (!ctx || !canvas) {
       return;
     }
-    console.log(this.list);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.save();
     ctx.translate(canvas.width / 2, canvas.height / 2);
-    ctx.rotate((angle / 180) * Math.PI);
-    ctx.fillRect(-RECT_SIZE / 2, -RECT_SIZE / 2, RECT_SIZE, RECT_SIZE);
+
+    if (this.list.length) {
+      const SIZE_MIN = 100;
+      const SIZE_MAX = 200;
+      const DOT_SIZE = 5;
+
+      const min = minBy(this.list, item => item.followersCount);
+      const max = maxBy(this.list, item => item.followersCount);
+      const points = this.list.map((item, i) => {
+        const r = i / this.list.length;
+        const offset = angle / 180;
+        const a = Math.PI * 2 * (r + offset);
+        const size = mix(
+          SIZE_MIN,
+          SIZE_MAX,
+          (item.followersCount - min.followersCount) /
+            (max.followersCount - min.followersCount)
+        );
+        const x = Math.cos(a) * size;
+        const y = Math.sin(a) * size;
+        return { x, y };
+      });
+
+      ctx.beginPath();
+      points.forEach(({ x, y }, i) => {
+        if (i) {
+          ctx.lineTo(x, y);
+        } else {
+          ctx.moveTo(x, y);
+        }
+      });
+      ctx.stroke();
+
+      ctx.beginPath();
+      points.forEach(({ x, y }) => {
+        ctx.moveTo(x, y);
+        ctx.arc(x, y, DOT_SIZE, 0, Math.PI * 2);
+      });
+      ctx.fill();
+    }
     ctx.restore();
   }
 
   public update(delta: number) {
-    this.angle += delta * 0.1;
+    this.angle += delta * 0.02;
     this.render();
   }
 
