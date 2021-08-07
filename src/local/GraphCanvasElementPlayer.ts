@@ -1,5 +1,5 @@
 import { CanvasPlayer } from "~/lib/useCanvasAgent";
-import { minBy, maxBy, mix } from "~/lib/lodashLike";
+import { minBy, maxBy, mix, padLeft } from "~/lib/lodashLike";
 import { TwitterData } from "~/scheme/TwitterData";
 
 export default class GraphCanvasElementPlayer implements CanvasPlayer {
@@ -35,13 +35,13 @@ export default class GraphCanvasElementPlayer implements CanvasPlayer {
       const SIZE_MIN = 100;
       const SIZE_MAX = 200;
       const DOT_SIZE = 5;
+      const FONT_SIZE = 30;
 
       const min = minBy(this.list, item => item.followersCount);
       const max = maxBy(this.list, item => item.followersCount);
       const points = this.list.map((item, i) => {
         const r = i / this.list.length;
-        const offset = angle / 180;
-        const a = Math.PI * 2 * (r + offset);
+        const a = Math.PI * 2 * (r - angle);
         const size = mix(
           SIZE_MIN,
           SIZE_MAX,
@@ -52,6 +52,9 @@ export default class GraphCanvasElementPlayer implements CanvasPlayer {
         const y = Math.sin(a) * size;
         return { x, y };
       });
+      const focusIndex =
+        Math.round(angle * this.list.length) % this.list.length;
+      const focusItem = this.list[focusIndex];
 
       ctx.beginPath();
       points.forEach(({ x, y }, i) => {
@@ -63,18 +66,43 @@ export default class GraphCanvasElementPlayer implements CanvasPlayer {
       });
       ctx.stroke();
 
-      ctx.beginPath();
-      points.forEach(({ x, y }) => {
-        ctx.moveTo(x, y);
-        ctx.arc(x, y, DOT_SIZE, 0, Math.PI * 2);
+      points.forEach(({ x, y }, i) => {
+        if (i === focusIndex || i === 0 || i === this.list.length - 1) {
+          ctx.save();
+          ctx.fillStyle = i === focusIndex ? "#f00" : "#000";
+          ctx.beginPath();
+          ctx.arc(x, y, DOT_SIZE, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
       });
-      ctx.fill();
+
+      if (focusItem) {
+        const d = new Date(focusItem.createdAt);
+        ctx.save();
+        ctx.fillStyle = "#f00";
+        ctx.font = `${FONT_SIZE}px/${FONT_SIZE}px sans-serif`;
+        ctx.textAlign = "center";
+        ctx.fillText(focusItem.followersCount.toString(), 0, 0);
+        ctx.font = `${FONT_SIZE * 0.5}px/${FONT_SIZE * 0.5}px sans-serif`;
+        ctx.fillText(
+          [
+            [d.getFullYear(), d.getMonth() + 1, d.getDate()]
+              .map(n => padLeft(n, 2))
+              .join("/"),
+            [d.getHours(), d.getMinutes()].map(n => padLeft(n, 2)).join(":")
+          ].join(" "),
+          0,
+          FONT_SIZE * 0.7
+        );
+        ctx.restore();
+      }
     }
     ctx.restore();
   }
 
   public update(delta: number) {
-    this.angle += delta * 0.02;
+    this.angle += delta * (0.005 / 180);
     this.render();
   }
 
