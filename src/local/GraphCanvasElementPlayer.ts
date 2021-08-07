@@ -18,7 +18,7 @@ export default class GraphCanvasElementPlayer implements CanvasPlayer {
 
   private ctx: CanvasRenderingContext2D | null;
 
-  private angle = 0;
+  private scroll = 0;
 
   private scale = 1;
 
@@ -41,8 +41,12 @@ export default class GraphCanvasElementPlayer implements CanvasPlayer {
     this.twitterName = twitterName;
   }
 
+  public setScroll(num: number) {
+    this.scroll = num;
+  }
+
   private render() {
-    const { ctx, canvas, angle } = this;
+    const { ctx, canvas, scroll } = this;
     if (!ctx || !canvas) {
       return;
     }
@@ -57,7 +61,7 @@ export default class GraphCanvasElementPlayer implements CanvasPlayer {
       const max = maxBy(this.list, item => item.followersCount);
       const points = this.list.map((item, i) => {
         const r = i / this.list.length;
-        const a = Math.PI * 2 * (r - angle);
+        const a = Math.PI * 2 * (r - scroll);
         const size = mix(
           SIZE_MIN,
           SIZE_MAX,
@@ -69,7 +73,7 @@ export default class GraphCanvasElementPlayer implements CanvasPlayer {
         return { x, y };
       });
       const focusIndex =
-        Math.round(angle * this.list.length) % this.list.length;
+        Math.round(scroll * (this.list.length - 1)) % this.list.length;
       const focusItem = this.list[focusIndex];
 
       ctx.beginPath();
@@ -126,8 +130,7 @@ export default class GraphCanvasElementPlayer implements CanvasPlayer {
     ctx.restore();
   }
 
-  public update(delta: number) {
-    this.angle += delta * (0.005 / 180);
+  public update() {
     this.render();
   }
 

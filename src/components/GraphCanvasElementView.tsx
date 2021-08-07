@@ -23,8 +23,9 @@ const canvasStyle = css({
 const GraphCanvasElementView = (props: {
   list: TwitterData[];
   twitterName: string;
+  scroll: number;
 }) => {
-  const { list, twitterName } = props;
+  const { list, twitterName, scroll } = props;
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const { playerRef } = useCanvasAgent({
     initializer: () => new GraphCanvasElementPlayer(),
@@ -42,6 +43,12 @@ const GraphCanvasElementView = (props: {
       player.setTwitterName(twitterName);
     }
   }, [twitterName]);
+  useEffect(() => {
+    const { current: player } = playerRef;
+    if (player) {
+      player.setScroll(scroll);
+    }
+  }, [scroll]);
   return <div css={canvasStyle} ref={wrapperRef} />;
 };
 

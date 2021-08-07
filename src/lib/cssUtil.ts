@@ -21,6 +21,10 @@ export const vw = (...nums: number[]) => {
   return appendPostfix(nums, "vw");
 };
 
+export const vh = (...nums: number[]) => {
+  return appendPostfix(nums, "vh");
+};
+
 export const pcp = (...nums: number[]) => {
   return vw(...nums.map(n => (n / PC_VIEWPORT_SIZE) * 100));
 };
