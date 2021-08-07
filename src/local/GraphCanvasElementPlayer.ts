@@ -2,12 +2,20 @@ import { CanvasPlayer } from "~/lib/useCanvasAgent";
 import { minBy, maxBy, mix, padLeft } from "~/lib/lodashLike";
 import { TwitterData } from "~/scheme/TwitterData";
 
+const VIEWPORT = 450;
+const SIZE_MIN = 100;
+const SIZE_MAX = 200;
+const DOT_SIZE = 5;
+const FONT_SIZE = 30;
+
 export default class GraphCanvasElementPlayer implements CanvasPlayer {
   public readonly canvas: HTMLCanvasElement;
 
   private ctx: CanvasRenderingContext2D | null;
 
   private angle = 0;
+
+  private scale = 1;
 
   private list: TwitterData[] = [];
 
@@ -30,13 +38,9 @@ export default class GraphCanvasElementPlayer implements CanvasPlayer {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.save();
     ctx.translate(canvas.width / 2, canvas.height / 2);
+    ctx.scale(this.scale, this.scale);
 
     if (this.list.length) {
-      const SIZE_MIN = 100;
-      const SIZE_MAX = 200;
-      const DOT_SIZE = 5;
-      const FONT_SIZE = 30;
-
       const min = minBy(this.list, item => item.followersCount);
       const max = maxBy(this.list, item => item.followersCount);
       const points = this.list.map((item, i) => {
@@ -111,6 +115,7 @@ export default class GraphCanvasElementPlayer implements CanvasPlayer {
     const resolution = window.devicePixelRatio;
     canvas.width = canvas.offsetWidth * resolution;
     canvas.height = canvas.offsetHeight * resolution;
+    this.scale = Math.min(canvas.width, canvas.height) / VIEWPORT;
     this.render();
   }
 
