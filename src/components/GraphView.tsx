@@ -1,7 +1,6 @@
 import dynamic from "next/dynamic";
 import { useState, useEffect, useMemo } from "react";
 import { css } from "@emotion/react";
-import { px, percent } from "~/lib/cssUtil";
 import { firebaseFirestore } from "~/local/firebaseApp";
 
 const SampleCanvasElementView = dynamic(
@@ -25,15 +24,11 @@ const parseTwitterData = (src: any): TwitterData => {
 };
 
 const wrapperStyle = css({
-  position: "fixed",
+  position: "relative",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
   flexDirection: "column",
-  top: px(0),
-  left: px(0),
-  width: percent(100),
-  height: percent(100),
   color: "#f00",
   textAlign: "center"
 });
