@@ -4,6 +4,7 @@ import { MQ_DESKTOP, MQ_MOBILE } from "~/lib/MQ";
 
 export const globalStyle = css({
   body: {
+    backgroundColor: "#003",
     fontFamily: "sans-serif",
     fontSize: 16,
     lineHeight: 1.5,

@@ -51,6 +51,16 @@ const MetaSettings = (props: PageMetaExtend) => {
       {META.FAVICON_IMAGE ? (
         <link rel="icon" type="image/x-icon" href={META.FAVICON_IMAGE.src} />
       ) : null}
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossOrigin="crossOrigin"
+      />
+      <link
+        href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap"
+        rel="stylesheet"
+      />
     </Head>
   );
 };

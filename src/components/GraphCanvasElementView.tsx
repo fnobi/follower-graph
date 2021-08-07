@@ -20,8 +20,11 @@ const canvasStyle = css({
   }
 });
 
-const GraphCanvasElementView = (props: { list: TwitterData[] }) => {
-  const { list } = props;
+const GraphCanvasElementView = (props: {
+  list: TwitterData[];
+  twitterName: string;
+}) => {
+  const { list, twitterName } = props;
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const { playerRef } = useCanvasAgent({
     initializer: () => new GraphCanvasElementPlayer(),
@@ -32,7 +35,13 @@ const GraphCanvasElementView = (props: { list: TwitterData[] }) => {
     if (player) {
       player.setList(list);
     }
-  }, [list, playerRef]);
+  }, [list]);
+  useEffect(() => {
+    const { current: player } = playerRef;
+    if (player) {
+      player.setTwitterName(twitterName);
+    }
+  }, [twitterName]);
   return <div css={canvasStyle} ref={wrapperRef} />;
 };
 

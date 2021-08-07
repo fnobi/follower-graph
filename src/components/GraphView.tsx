@@ -10,6 +10,7 @@ const GraphCanvasElementView = dynamic(
 
 const GraphView = (props: { myId: string }) => {
   const { myId } = props;
+  const [twitterName, setTwitterName] = useState("");
   const [list, setList] = useState<TwitterData[]>([]);
 
   useEffect(() => {
@@ -24,7 +25,17 @@ const GraphView = (props: { myId: string }) => {
       });
   }, [myId]);
 
-  return <GraphCanvasElementView list={list} />;
+  useEffect(() => {
+    return firebaseFirestore()
+      .collection("users")
+      .doc(myId)
+      .onSnapshot(snapshot => {
+        const d = snapshot.data();
+        setTwitterName(d ? d.twitter : "");
+      });
+  }, [myId]);
+
+  return <GraphCanvasElementView list={list} twitterName={twitterName} />;
 };
 
 export default GraphView;

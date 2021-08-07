@@ -5,8 +5,13 @@ import { TwitterData } from "~/scheme/TwitterData";
 const VIEWPORT = 450;
 const SIZE_MIN = 100;
 const SIZE_MAX = 200;
-const DOT_SIZE = 5;
-const FONT_SIZE = 30;
+const DOT_SIZE = 4;
+const FONT_SIZE = 40;
+const FONT_FAMILY = "'Bebas Neue', cursive";
+
+const makeFont = (size: number) => {
+  return `${size}px/${size}px ${FONT_FAMILY}`;
+};
 
 export default class GraphCanvasElementPlayer implements CanvasPlayer {
   public readonly canvas: HTMLCanvasElement;
@@ -19,6 +24,8 @@ export default class GraphCanvasElementPlayer implements CanvasPlayer {
 
   private list: TwitterData[] = [];
 
+  private twitterName: string = "";
+
   public constructor() {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
@@ -30,6 +37,10 @@ export default class GraphCanvasElementPlayer implements CanvasPlayer {
     this.list = list;
   }
 
+  public setTwitterName(twitterName: string) {
+    this.twitterName = twitterName;
+  }
+
   private render() {
     const { ctx, canvas, angle } = this;
     if (!ctx || !canvas) {
@@ -39,6 +50,7 @@ export default class GraphCanvasElementPlayer implements CanvasPlayer {
     ctx.save();
     ctx.translate(canvas.width / 2, canvas.height / 2);
     ctx.scale(this.scale, this.scale);
+    ctx.strokeStyle = "#fff";
 
     if (this.list.length) {
       const min = minBy(this.list, item => item.followersCount);
@@ -73,10 +85,13 @@ export default class GraphCanvasElementPlayer implements CanvasPlayer {
       points.forEach(({ x, y }, i) => {
         if (i === focusIndex || i === 0 || i === this.list.length - 1) {
           ctx.save();
-          ctx.fillStyle = i === focusIndex ? "#f00" : "#000";
+          ctx.fillStyle = i === focusIndex ? "#fff" : "#003";
           ctx.beginPath();
           ctx.arc(x, y, DOT_SIZE, 0, Math.PI * 2);
           ctx.fill();
+          if (i !== focusIndex) {
+            ctx.stroke();
+          }
           ctx.restore();
         }
       });
@@ -84,11 +99,14 @@ export default class GraphCanvasElementPlayer implements CanvasPlayer {
       if (focusItem) {
         const d = new Date(focusItem.createdAt);
         ctx.save();
-        ctx.fillStyle = "#f00";
-        ctx.font = `${FONT_SIZE}px/${FONT_SIZE}px sans-serif`;
+        ctx.fillStyle = "#fff";
         ctx.textAlign = "center";
-        ctx.fillText(focusItem.followersCount.toString(), 0, 0);
-        ctx.font = `${FONT_SIZE * 0.5}px/${FONT_SIZE * 0.5}px sans-serif`;
+        ctx.textBaseline = "middle";
+
+        ctx.font = makeFont(FONT_SIZE);
+        ctx.fillText(focusItem.followersCount.toLocaleString(), 0, 0);
+
+        ctx.font = makeFont(FONT_SIZE * 0.3);
         ctx.fillText(
           [
             [d.getFullYear(), d.getMonth() + 1, d.getDate()]
@@ -97,8 +115,11 @@ export default class GraphCanvasElementPlayer implements CanvasPlayer {
             [d.getHours(), d.getMinutes()].map(n => padLeft(n, 2)).join(":")
           ].join(" "),
           0,
-          FONT_SIZE * 0.7
+          FONT_SIZE * 0.6
         );
+        if (this.twitterName) {
+          ctx.fillText(`@${this.twitterName}`, 0, -FONT_SIZE * 0.75);
+        }
         ctx.restore();
       }
     }
