@@ -4,7 +4,7 @@ import { css } from "@emotion/react";
 import { percent } from "~/lib/cssUtil";
 import { firebaseAuth } from "~/local/firebaseApp";
 import LoadingView from "~/components/LoadingView";
-import GraphView from "~/components/GraphView";
+import ProfileView from "~/components/ProfileView";
 
 type UserInfo = {
   id: string;
@@ -39,7 +39,7 @@ const PageIndex = () => {
   }
 
   return user.id ? (
-    <GraphView myId={user.id} />
+    <ProfileView myId={user.id} />
   ) : (
     <div css={wrapperStyle}>
       <button type="button" onClick={signIn}>

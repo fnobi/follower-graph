@@ -31,7 +31,7 @@ const footerStyle = css({
   right: em(1)
 });
 
-const GraphView = (props: { myId: string }) => {
+const ProfileView = (props: { myId: string }) => {
   const { myId } = props;
   const [account, setAccount] = useState<{ twitter: string } | null>(null);
   const [list, setList] = useState<TwitterData[] | null>(null);
@@ -90,4 +90,4 @@ const GraphView = (props: { myId: string }) => {
   );
 };
 
-export default GraphView;
+export default ProfileView;
