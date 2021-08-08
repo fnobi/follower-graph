@@ -86,29 +86,31 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
       const focusIndex = Math.round(scroll * (this.list.length - 1));
       const focusItem = this.list[focusIndex];
 
-      ctx.beginPath();
-      points.forEach(({ x, y }, i) => {
-        if (i) {
-          ctx.lineTo(x, y);
-        } else {
-          ctx.moveTo(x, y);
-        }
-      });
-      ctx.stroke();
-
-      points.forEach(({ x, y }, i) => {
-        if (i === focusIndex || i === 0 || i === this.list.length - 1) {
-          ctx.save();
-          ctx.fillStyle = i === focusIndex ? "#fff" : "#003";
-          ctx.beginPath();
-          ctx.arc(x, y, DOT_SIZE, 0, Math.PI * 2);
-          ctx.fill();
-          if (i !== focusIndex) {
-            ctx.stroke();
+      if (points.length > 1) {
+        ctx.beginPath();
+        points.forEach(({ x, y }, i) => {
+          if (i) {
+            ctx.lineTo(x, y);
+          } else {
+            ctx.moveTo(x, y);
           }
-          ctx.restore();
-        }
-      });
+        });
+        ctx.stroke();
+
+        points.forEach(({ x, y }, i) => {
+          if (i === focusIndex || i === 0 || i === this.list.length - 1) {
+            ctx.save();
+            ctx.fillStyle = i === focusIndex ? "#fff" : "#003";
+            ctx.beginPath();
+            ctx.arc(x, y, DOT_SIZE, 0, Math.PI * 2);
+            ctx.fill();
+            if (i !== focusIndex) {
+              ctx.stroke();
+            }
+            ctx.restore();
+          }
+        });
+      }
 
       if (focusItem) {
         const d = new Date(focusItem.createdAt);
