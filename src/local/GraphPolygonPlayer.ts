@@ -13,7 +13,7 @@ const makeFont = (size: number) => {
   return `${size}px/${size}px ${FONT_FAMILY}`;
 };
 
-export default class GraphCanvasElementPlayer implements CanvasPlayer {
+export default class GraphPolygonPlayer implements CanvasPlayer {
   public readonly canvas: HTMLCanvasElement;
 
   private ctx: CanvasRenderingContext2D | null;

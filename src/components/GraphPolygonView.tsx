@@ -3,7 +3,7 @@ import { css } from "@emotion/react";
 import { percent } from "~/lib/cssUtil";
 import useCanvasAgent from "~/lib/useCanvasAgent";
 import Dragger from "~/lib/Dragger";
-import GraphCanvasElementPlayer from "~/local/GraphCanvasElementPlayer";
+import GraphPolygonPlayer from "~/local/GraphPolygonPlayer";
 import { TwitterData } from "~/scheme/TwitterData";
 
 const canvasStyle = css({
@@ -21,14 +21,14 @@ const canvasStyle = css({
   }
 });
 
-const GraphCanvasElementView = (props: {
+const GraphPolygonView = (props: {
   list: TwitterData[];
   twitterName: string;
 }) => {
   const { list, twitterName } = props;
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const { playerRef } = useCanvasAgent({
-    initializer: () => new GraphCanvasElementPlayer(),
+    initializer: () => new GraphPolygonPlayer(),
     wrapperRef
   });
 
@@ -72,4 +72,4 @@ const GraphCanvasElementView = (props: {
   return <div css={canvasStyle} ref={wrapperRef} />;
 };
 
-export default GraphCanvasElementView;
+export default GraphPolygonView;

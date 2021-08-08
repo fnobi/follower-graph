@@ -8,8 +8,8 @@ import { parseTwitterData, TwitterData } from "~/scheme/TwitterData";
 import LoadingView from "~/components/LoadingView";
 import NewAccountForm from "~/components/NewAccountForm";
 
-const GraphCanvasElementView = dynamic(
-  () => import("~/components/GraphCanvasElementView"),
+const GraphPolygonView = dynamic(
+  () => import("~/components/GraphPolygonView"),
   { ssr: false }
 );
 
@@ -67,7 +67,7 @@ const GraphView = (props: { myId: string }) => {
   return (
     <div>
       {account.twitter ? (
-        <GraphCanvasElementView list={list} twitterName={account.twitter} />
+        <GraphPolygonView list={list} twitterName={account.twitter} />
       ) : (
         <div css={wrapperStyle}>
           <NewAccountForm myId={myId} />
