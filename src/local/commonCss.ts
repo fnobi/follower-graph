@@ -1,5 +1,5 @@
 import { css } from "@emotion/react";
-import { pcp, spp } from "~/lib/cssUtil";
+import { em, pcp, px, spp } from "~/lib/cssUtil";
 import { MQ_DESKTOP, MQ_MOBILE } from "~/lib/MQ";
 
 export const globalStyle = css({
@@ -58,3 +58,17 @@ export const responsiveImageTile = (
       backgroundImage: image2 ? `url(${image2.src})` : undefined
     }
   });
+
+export const buttonLinkStyle = css(buttonReset, {
+  border: `solid ${px(1)} #fff`,
+  padding: em(0, 0.5),
+  boxShadow: `${px(1)} ${px(2)} ${px(0)} #fff`,
+  transform: `translate(${px(-1)},${px(-2)})`,
+  "&:hover": {
+    boxShadow: "none",
+    cursor: "pointer",
+    transform: `translate(${px(0)},${px(0)})`
+  }
+});
+
+export const CUSTOM_FONT_FAMILY = "'Bebas Neue', cursive";

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { em, percent } from "~/lib/cssUtil";
 import { accountDocumentRef, accountLogCollectionRef } from "~/local/database";
 import { firebaseAuth } from "~/local/firebaseApp";
+import { buttonLinkStyle } from "~/local/commonCss";
 import { parseTwitterData, TwitterData } from "~/scheme/TwitterData";
 import LoadingView from "~/components/LoadingView";
 import NewAccountForm from "~/components/NewAccountForm";
@@ -76,13 +77,13 @@ const ProfileView = (props: { myId: string }) => {
       <div css={footerStyle}>
         {account.twitter ? (
           <>
-            <button type="button" onClick={clearAccount}>
+            <button type="button" onClick={clearAccount} css={buttonLinkStyle}>
               clear
             </button>
             &nbsp;
           </>
         ) : null}
-        <button type="button" onClick={signOut}>
+        <button type="button" onClick={signOut} css={buttonLinkStyle}>
           logout
         </button>
       </div>

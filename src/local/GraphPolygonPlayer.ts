@@ -1,5 +1,6 @@
 import { CanvasPlayer } from "~/lib/useCanvasAgent";
 import { minBy, maxBy, mix, padLeft, clamp } from "~/lib/lodashLike";
+import { CUSTOM_FONT_FAMILY } from "~/local/commonCss";
 import { TwitterData } from "~/scheme/TwitterData";
 
 const VIEWPORT = 450;
@@ -7,10 +8,9 @@ const SIZE_MIN = 100;
 const SIZE_MAX = 200;
 const DOT_SIZE = 4;
 const FONT_SIZE = 45;
-const FONT_FAMILY = "'Bebas Neue', cursive";
 
 const makeFont = (size: number) => {
-  return `${size}px/${size}px ${FONT_FAMILY}`;
+  return `${size}px/${size}px ${CUSTOM_FONT_FAMILY}`;
 };
 
 export default class GraphPolygonPlayer implements CanvasPlayer {
