@@ -1,5 +1,5 @@
 import { FormEvent, useState } from "react";
-import { usersDocumentRef } from "~/local/database";
+import { accountDocumentRef } from "~/local/database";
 
 const NewAccountForm = (props: { myId: string }) => {
   const { myId } = props;
@@ -9,7 +9,7 @@ const NewAccountForm = (props: { myId: string }) => {
     if (!account || !myId) {
       return;
     }
-    usersDocumentRef(myId).set({ twitter: account });
+    accountDocumentRef(myId).set({ twitter: account });
   };
   return (
     <form onSubmit={handleSubmit}>

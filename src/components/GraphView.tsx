@@ -2,7 +2,7 @@ import { css } from "@emotion/react";
 import dynamic from "next/dynamic";
 import { useState, useEffect } from "react";
 import { em, percent } from "~/lib/cssUtil";
-import { usersDocumentRef, usersLogCollectionRef } from "~/local/database";
+import { accountDocumentRef, accountLogCollectionRef } from "~/local/database";
 import { firebaseAuth } from "~/local/firebaseApp";
 import { parseTwitterData, TwitterData } from "~/scheme/TwitterData";
 import LoadingView from "~/components/LoadingView";
@@ -33,7 +33,7 @@ const footerStyle = css({
 
 const GraphView = (props: { myId: string }) => {
   const { myId } = props;
-  const [user, setUser] = useState<{ twitter: string } | null>(null);
+  const [account, setAccount] = useState<{ twitter: string } | null>(null);
   const [list, setList] = useState<TwitterData[] | null>(null);
 
   const signOut = () => {
@@ -41,11 +41,11 @@ const GraphView = (props: { myId: string }) => {
   };
 
   const clearAccount = () => {
-    usersDocumentRef(myId).delete();
+    accountDocumentRef(myId).delete();
   };
 
   useEffect(() => {
-    return usersLogCollectionRef(myId)
+    return accountLogCollectionRef(myId)
       .limit(100)
       .orderBy("createdAt", "desc")
       .onSnapshot(snapshot => {
@@ -54,27 +54,27 @@ const GraphView = (props: { myId: string }) => {
   }, [myId]);
 
   useEffect(() => {
-    return usersDocumentRef(myId).onSnapshot(snapshot => {
+    return accountDocumentRef(myId).onSnapshot(snapshot => {
       const d = snapshot.data();
-      setUser({ twitter: d ? d.twitter : "" });
+      setAccount({ twitter: d ? d.twitter : "" });
     });
   }, [myId]);
 
-  if (!list || !user) {
+  if (!list || !account) {
     return <LoadingView />;
   }
 
   return (
     <div>
-      {user.twitter ? (
-        <GraphCanvasElementView list={list} twitterName={user.twitter} />
+      {account.twitter ? (
+        <GraphCanvasElementView list={list} twitterName={account.twitter} />
       ) : (
         <div css={wrapperStyle}>
           <NewAccountForm myId={myId} />
         </div>
       )}
       <div css={footerStyle}>
-        {user.twitter ? (
+        {account.twitter ? (
           <>
             <button type="button" onClick={clearAccount}>
               clear
