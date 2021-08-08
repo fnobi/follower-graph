@@ -3,9 +3,10 @@ import dynamic from "next/dynamic";
 import { useState, useEffect } from "react";
 import { em, percent } from "~/lib/cssUtil";
 import { usersDocumentRef, usersLogCollectionRef } from "~/local/database";
-import { firebaseAuth, firebaseFirestore } from "~/local/firebaseApp";
+import { firebaseAuth } from "~/local/firebaseApp";
 import { parseTwitterData, TwitterData } from "~/scheme/TwitterData";
-import NewAccountForm from "./NewAccountForm";
+import LoadingView from "~/components/LoadingView";
+import NewAccountForm from "~/components/NewAccountForm";
 
 const GraphCanvasElementView = dynamic(
   () => import("~/components/GraphCanvasElementView"),
@@ -32,18 +33,15 @@ const footerStyle = css({
 
 const GraphView = (props: { myId: string }) => {
   const { myId } = props;
-  const [twitterName, setTwitterName] = useState("");
-  const [list, setList] = useState<TwitterData[]>([]);
+  const [user, setUser] = useState<{ twitter: string } | null>(null);
+  const [list, setList] = useState<TwitterData[] | null>(null);
 
   const signOut = () => {
     firebaseAuth().signOut();
   };
 
   const clearAccount = () => {
-    firebaseFirestore()
-      .collection("users")
-      .doc(myId)
-      .delete();
+    usersDocumentRef(myId).delete();
   };
 
   useEffect(() => {
@@ -58,21 +56,25 @@ const GraphView = (props: { myId: string }) => {
   useEffect(() => {
     return usersDocumentRef(myId).onSnapshot(snapshot => {
       const d = snapshot.data();
-      setTwitterName(d ? d.twitter : "");
+      setUser({ twitter: d ? d.twitter : "" });
     });
   }, [myId]);
 
+  if (!list || !user) {
+    return <LoadingView />;
+  }
+
   return (
     <div>
-      {twitterName ? (
-        <GraphCanvasElementView list={list} twitterName={twitterName} />
+      {user.twitter ? (
+        <GraphCanvasElementView list={list} twitterName={user.twitter} />
       ) : (
         <div css={wrapperStyle}>
           <NewAccountForm myId={myId} />
         </div>
       )}
       <div css={footerStyle}>
-        {twitterName ? (
+        {user.twitter ? (
           <>
             <button type="button" onClick={clearAccount}>
               clear

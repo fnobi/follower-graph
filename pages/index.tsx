@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { css } from "@emotion/react";
 import { percent } from "~/lib/cssUtil";
 import { firebaseAuth } from "~/local/firebaseApp";
+import LoadingView from "~/components/LoadingView";
 import GraphView from "~/components/GraphView";
 
 type UserInfo = {
@@ -25,7 +26,7 @@ const PageIndex = () => {
   const [user, setUser] = useState<UserInfo | null>(null);
 
   useEffect(() => {
-    firebaseAuth().onAuthStateChanged(u => setUser(u ? { id: u.uid } : null));
+    firebaseAuth().onAuthStateChanged(u => setUser({ id: u ? u.uid : "" }));
   }, []);
 
   const signIn = () => {
@@ -33,7 +34,11 @@ const PageIndex = () => {
     firebaseAuth().signInWithPopup(p);
   };
 
-  return user ? (
+  if (!user) {
+    return <LoadingView />;
+  }
+
+  return user.id ? (
     <GraphView myId={user.id} />
   ) : (
     <div css={wrapperStyle}>

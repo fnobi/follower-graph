@@ -20,7 +20,7 @@ export default class GraphCanvasElementPlayer implements CanvasPlayer {
 
   private scroll = 0;
 
-  private scale = 1;
+  private scale = 0;
 
   private list: TwitterData[] = [];
 
