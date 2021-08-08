@@ -1,7 +1,7 @@
 import { css } from "@emotion/react";
 import dynamic from "next/dynamic";
 import { useState, useEffect } from "react";
-import { em, percent } from "~/lib/cssUtil";
+import { em } from "~/lib/cssUtil";
 import { accountDocumentRef, accountLogCollectionRef } from "~/local/database";
 import { firebaseAuth } from "~/local/firebaseApp";
 import { buttonLinkStyle } from "~/local/commonCss";
@@ -13,18 +13,6 @@ const GraphPolygonView = dynamic(
   () => import("~/components/GraphPolygonView"),
   { ssr: false }
 );
-
-const wrapperStyle = css({
-  position: "fixed",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  flexDirection: "column",
-  top: percent(0),
-  left: percent(0),
-  width: percent(100),
-  height: percent(100)
-});
 
 const footerStyle = css({
   position: "fixed",
@@ -70,9 +58,7 @@ const ProfileView = (props: { myId: string }) => {
       {account.twitter ? (
         <GraphPolygonView list={list} twitterName={account.twitter} />
       ) : (
-        <div css={wrapperStyle}>
-          <NewAccountForm myId={myId} />
-        </div>
+        <NewAccountForm myId={myId} />
       )}
       <div css={footerStyle}>
         {account.twitter ? (

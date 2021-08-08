@@ -1,10 +1,19 @@
 import { css } from "@emotion/react";
 import { FormEvent, useState } from "react";
-import { em } from "~/lib/cssUtil";
+import { em, percent } from "~/lib/cssUtil";
 import { buttonLinkStyle } from "~/local/commonCss";
 import { accountDocumentRef } from "~/local/database";
 
 const wrapperStyle = css({
+  position: "fixed",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  flexDirection: "column",
+  top: percent(0),
+  left: percent(0),
+  width: percent(100),
+  height: percent(100),
   textAlign: "center"
 });
 
