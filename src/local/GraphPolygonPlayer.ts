@@ -6,7 +6,7 @@ const VIEWPORT = 450;
 const SIZE_MIN = 100;
 const SIZE_MAX = 200;
 const DOT_SIZE = 4;
-const FONT_SIZE = 40;
+const FONT_SIZE = 45;
 const FONT_FAMILY = "'Bebas Neue', cursive";
 
 const makeFont = (size: number) => {
@@ -114,6 +114,13 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
 
       if (focusItem) {
         const d = new Date(focusItem.createdAt);
+        const dateString = [
+          [d.getFullYear(), d.getMonth() + 1, d.getDate()]
+            .map(n => padLeft(n, 2))
+            .join("/"),
+          [d.getHours(), d.getMinutes()].map(n => padLeft(n, 2)).join(":")
+        ].join(" ");
+
         ctx.save();
         ctx.fillStyle = "#fff";
         ctx.textAlign = "center";
@@ -122,19 +129,10 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
         ctx.font = makeFont(FONT_SIZE);
         ctx.fillText(focusItem.followersCount.toLocaleString(), 0, 0);
 
-        ctx.font = makeFont(FONT_SIZE * 0.3);
-        ctx.fillText(
-          [
-            [d.getFullYear(), d.getMonth() + 1, d.getDate()]
-              .map(n => padLeft(n, 2))
-              .join("/"),
-            [d.getHours(), d.getMinutes()].map(n => padLeft(n, 2)).join(":")
-          ].join(" "),
-          0,
-          FONT_SIZE * 0.6
-        );
+        ctx.font = makeFont(FONT_SIZE * 0.5);
+        ctx.fillText(dateString, 0, FONT_SIZE * 1);
         if (this.twitterName) {
-          ctx.fillText(`@${this.twitterName}`, 0, -FONT_SIZE * 0.75);
+          ctx.fillText(`@${this.twitterName}`, 0, -FONT_SIZE * 1.1);
         }
         ctx.restore();
       }
