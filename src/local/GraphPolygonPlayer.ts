@@ -75,7 +75,9 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
         const size = mix(
           SIZE_MIN,
           SIZE_MAX,
-          minCount === maxCount ? 0 : (count - minCount) / (maxCount - minCount)
+          minCount === maxCount
+            ? 0.5
+            : (count - minCount) / (maxCount - minCount)
         );
         const x = Math.cos(a) * size;
         const y = Math.sin(a) * size;
