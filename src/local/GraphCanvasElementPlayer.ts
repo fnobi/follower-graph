@@ -61,16 +61,21 @@ export default class GraphCanvasElementPlayer implements CanvasPlayer {
     ctx.strokeStyle = "#fff";
 
     if (this.list.length) {
-      const min = minBy(this.list, item => item.followersCount);
-      const max = maxBy(this.list, item => item.followersCount);
-      const points = this.list.map((item, i) => {
+      const { followersCount: minCount } = minBy(
+        this.list,
+        item => item.followersCount
+      );
+      const { followersCount: maxCount } = maxBy(
+        this.list,
+        item => item.followersCount
+      );
+      const points = this.list.map(({ followersCount: count }, i) => {
         const r = i / this.list.length;
         const a = Math.PI * 2 * (r - scroll);
         const size = mix(
           SIZE_MIN,
           SIZE_MAX,
-          (item.followersCount - min.followersCount) /
-            (max.followersCount - min.followersCount)
+          minCount === maxCount ? 0 : (count - minCount) / (maxCount - minCount)
         );
         const x = Math.cos(a) * size;
         const y = Math.sin(a) * size;
