@@ -7,6 +7,7 @@ const VIEWPORT = 450;
 const SIZE_MIN = 100;
 const SIZE_MAX = 200;
 const DOT_SIZE = 4;
+const MIN_SPLIT_COUNT = 6;
 const FONT_SIZE = 45;
 
 const makeFont = (size: number) => {
@@ -69,9 +70,10 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
         this.list,
         item => item.followersCount
       );
+      const splitCount = Math.max(MIN_SPLIT_COUNT, this.list.length);
+      const scrollOffset = ((this.list.length - 1) / splitCount) * scroll;
       const points = this.list.map(({ followersCount: count }, i) => {
-        const r = i / this.list.length;
-        const a = Math.PI * 2 * (r - scroll);
+        const a = Math.PI * 2 * (i / splitCount - scrollOffset);
         const size = mix(
           SIZE_MIN,
           SIZE_MAX,
