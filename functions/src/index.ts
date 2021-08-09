@@ -31,7 +31,7 @@ async function writeLogData(
     followersCount: res.followers_count,
     friendsCount: res.friends_count,
     hours: d.getHours(),
-    days: d.getDate(),
+    days: d.getDate()
   });
 }
 
