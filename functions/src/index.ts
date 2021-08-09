@@ -1,7 +1,8 @@
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
-import {TWITTER_BEARER_TOKEN} from "./local/config";
+import { TWITTER_BEARER_TOKEN } from "./local/config";
 import TwitterApiClient from "./local/TwitterApiClient";
+import { TwitterData } from "./sync/scheme/TwitterData";
 
 admin.initializeApp(functions.config().firebase);
 
@@ -20,19 +21,20 @@ async function writeLogData(
       FirebaseFirestore.DocumentData
     >
 ) {
-  const {twitter: name} = snapshot.data();
+  const { twitter: name } = snapshot.data();
   if (!name) {
     return;
   }
   const res = await client.showUser(name);
   const d = new Date();
-  await accountLogCollectionRef(snapshot.id).doc().set({
+  const t: TwitterData = {
     createdAt: d.getTime(),
     followersCount: res.followers_count,
     friendsCount: res.friends_count,
     hours: d.getHours(),
     days: d.getDate()
-  });
+  };
+  await accountLogCollectionRef(snapshot.id).doc().set(t);
 }
 
 exports.scheduleFetchFollowers = functions.pubsub

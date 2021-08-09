@@ -27,8 +27,9 @@ module.exports = {
   ],
   rules: {
     "quotes": ["error", "double"],
-    "require-jsdoc": 0,
+    "object-curly-spacing": ["error", "always"],
     "comma-dangle": ["error", "never"],
+    "require-jsdoc": 0,
     "@typescript-eslint/explicit-module-boundary-types": 0
   }
 };
