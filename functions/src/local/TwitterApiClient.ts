@@ -30,8 +30,8 @@ export default class TwitterApiClient {
           .get(`${TwitterApiClient.API_ORIGIN}${path}`, {
             searchParams,
             headers: {
-              "Authorization": `Bearer ${this.bearerToken}`,
-            },
+              "Authorization": `Bearer ${this.bearerToken}`
+            }
           })
           .json<T>();
     }
@@ -40,7 +40,7 @@ export default class TwitterApiClient {
       return this.callApi(
           "/2/tweets/search/recent",
           {
-            query,
+            query
           }
       );
     }
@@ -49,7 +49,7 @@ export default class TwitterApiClient {
       return this.callApi<TwitterUserObject>(
           "/1.1/users/show.json",
           {
-            screen_name: screenName,
+            screen_name: screenName
           }
       );
     }
