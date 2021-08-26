@@ -18,13 +18,13 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: ${{ env.ACTIONS_NODE_VERSION }}
-      - name: install dependencies
-        run: ${{ env.ACTIONS_INSTALL_COMMAND }}
-      - uses: actions/cache@v1
+      - uses: actions/cache@v2
         with:
           path: node_modules
           key: ${{ runner.os }}-node-${{ hashFiles(format('**/{0}',env.ACTIONS_LOCK_FILE)) }}
           restore-keys: ${{ runner.os }}-node-
+      - name: install dependencies
+        run: ${{ env.ACTIONS_INSTALL_COMMAND }}
       - name: build
         run: ${{ env.ACTIONS_BUILD_COMMAND }}
       - uses: FirebaseExtended/action-hosting-deploy@v0
