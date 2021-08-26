@@ -2,8 +2,15 @@ import { css } from "@emotion/react";
 import dynamic from "next/dynamic";
 import { useState, useEffect } from "react";
 import { em } from "~/lib/cssUtil";
+import { getAuth, signOut as firebaseSignOut } from "firebase/auth";
+import {
+  deleteDoc,
+  limit,
+  onSnapshot,
+  orderBy,
+  query
+} from "firebase/firestore";
 import { accountDocumentRef, accountLogCollectionRef } from "~/local/database";
-import { firebaseAuth } from "~/local/firebaseApp";
 import { buttonLinkStyle } from "~/local/commonCss";
 import { parseTwitterData, TwitterData } from "~/scheme/TwitterData";
 import LoadingView from "~/components/LoadingView";
@@ -26,24 +33,28 @@ const ProfileView = (props: { myId: string }) => {
   const [list, setList] = useState<TwitterData[] | null>(null);
 
   const signOut = () => {
-    firebaseAuth().signOut();
+    firebaseSignOut(getAuth());
   };
 
   const clearAccount = () => {
-    accountDocumentRef(myId).delete();
+    deleteDoc(accountDocumentRef(myId));
   };
 
   useEffect(() => {
-    return accountLogCollectionRef(myId)
-      .limit(100)
-      .orderBy("createdAt", "desc")
-      .onSnapshot(snapshot => {
+    return onSnapshot(
+      query(
+        accountLogCollectionRef(myId),
+        limit(100),
+        orderBy("createdAt", "desc")
+      ),
+      snapshot => {
         setList(snapshot.docs.map(s => parseTwitterData(s.data())));
-      });
+      }
+    );
   }, [myId]);
 
   useEffect(() => {
-    return accountDocumentRef(myId).onSnapshot(snapshot => {
+    return onSnapshot(accountDocumentRef(myId), snapshot => {
       const d = snapshot.data();
       setAccount({ twitter: d ? d.twitter : "" });
     });

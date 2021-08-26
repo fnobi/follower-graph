@@ -1,8 +1,7 @@
-import { firebaseFirestore } from "~/local/firebaseApp";
+import { collection, doc, getFirestore } from "firebase/firestore";
 
-export const accountCollectionRef = () =>
-  firebaseFirestore().collection("users");
+export const accountCollectionRef = () => collection(getFirestore(), "users");
 export const accountDocumentRef = (id: string) =>
-  accountCollectionRef().doc(id);
+  doc(getFirestore(), accountCollectionRef().path, id);
 export const accountLogCollectionRef = (id: string) =>
-  accountDocumentRef(id).collection("log");
+  collection(getFirestore(), accountDocumentRef(id).path, "logs");
