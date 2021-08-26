@@ -1,4 +1,5 @@
 import { css } from "@emotion/react";
+import { setDoc } from "firebase/firestore";
 import { FormEvent, useState } from "react";
 import { em, percent } from "~/lib/cssUtil";
 import { buttonLinkStyle } from "~/local/commonCss";
@@ -33,7 +34,7 @@ const NewAccountForm = (props: { myId: string }) => {
     if (!account || !myId) {
       return;
     }
-    accountDocumentRef(myId).set({ twitter: account });
+    setDoc(accountDocumentRef(myId), { twitter: account });
   };
   return (
     <form onSubmit={handleSubmit} css={wrapperStyle}>

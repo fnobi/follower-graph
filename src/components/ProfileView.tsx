@@ -1,11 +1,20 @@
-import firebase from "firebase/app";
 import { css } from "@emotion/react";
 import dynamic from "next/dynamic";
 import { useState, useEffect } from "react";
 import { em, px } from "~/lib/cssUtil";
+import { signOut } from "firebase/auth";
+import {
+  deleteDoc,
+  limit,
+  onSnapshot,
+  orderBy,
+  query,
+  QueryConstraint,
+  where
+} from "firebase/firestore";
 import { accountDocumentRef, accountLogCollectionRef } from "~/local/database";
-import { firebaseAuth } from "~/local/firebaseApp";
 import { buttonLinkStyle, buttonReset } from "~/local/commonCss";
+import { firebaseAuth } from "~/local/firebaseApp";
 import { parseTwitterData, TwitterData } from "~/scheme/TwitterData";
 import LoadingView from "~/components/LoadingView";
 import NewAccountForm from "~/components/NewAccountForm";
@@ -34,37 +43,36 @@ const ProfileView = (props: { myId: string }) => {
   const [list, setList] = useState<TwitterData[] | null>(null);
   const [filter, setFilter] = useState<"hours" | "days" | "monthes">("hours");
 
-  const signOut = () => {
-    firebaseAuth().signOut();
+  const handleLogout = () => {
+    signOut(firebaseAuth());
   };
 
   const clearAccount = () => {
-    accountDocumentRef(myId).delete();
+    deleteDoc(accountDocumentRef(myId));
   };
 
   useEffect(() => {
     setList(null);
-    let ref:
-      | firebase.firestore.CollectionReference
-      | firebase.firestore.Query = accountLogCollectionRef(myId);
+    const ref = accountLogCollectionRef(myId);
+    const queryConstants: QueryConstraint[] = [];
     const d = new Date();
     if (filter === "days" || filter === "monthes") {
       const hour = d.getHours() + d.getTimezoneOffset() / 60 - 1;
-      ref = ref.where("hours", "==", (hour + 24) % 24);
+      queryConstants.push(where("hours", "==", (hour + 24) % 24));
     }
     if (filter === "monthes") {
-      ref = ref.where("days", "==", d.getDate());
+      queryConstants.push(where("days", "==", d.getDate()));
     }
-    return ref
-      .limit(100)
-      .orderBy("createdAt", "desc")
-      .onSnapshot(snapshot => {
+    return onSnapshot(
+      query(ref, ...queryConstants, limit(100), orderBy("createdAt", "desc")),
+      snapshot => {
         setList(snapshot.docs.map(s => parseTwitterData(s.data())));
-      });
+      }
+    );
   }, [myId, filter]);
 
   useEffect(() => {
-    return accountDocumentRef(myId).onSnapshot(snapshot => {
+    return onSnapshot(accountDocumentRef(myId), snapshot => {
       const d = snapshot.data();
       setAccount({ twitter: d ? d.twitter : "" });
     });
@@ -109,7 +117,7 @@ const ProfileView = (props: { myId: string }) => {
             &nbsp;
           </>
         ) : null}
-        <button type="button" onClick={signOut} css={buttonLinkStyle}>
+        <button type="button" onClick={handleLogout} css={buttonLinkStyle}>
           logout
         </button>
       </div>
