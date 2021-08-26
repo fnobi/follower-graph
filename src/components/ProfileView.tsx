@@ -1,17 +1,18 @@
 import { css } from "@emotion/react";
 import dynamic from "next/dynamic";
 import { useState, useEffect } from "react";
-import { em } from "~/lib/cssUtil";
+import { em, px } from "~/lib/cssUtil";
 import { getAuth, signOut as firebaseSignOut } from "firebase/auth";
 import {
   deleteDoc,
   limit,
   onSnapshot,
   orderBy,
-  query
+  query,
+  where
 } from "firebase/firestore";
 import { accountDocumentRef, accountLogCollectionRef } from "~/local/database";
-import { buttonLinkStyle } from "~/local/commonCss";
+import { buttonLinkStyle, buttonReset } from "~/local/commonCss";
 import { parseTwitterData, TwitterData } from "~/scheme/TwitterData";
 import LoadingView from "~/components/LoadingView";
 import NewAccountForm from "~/components/NewAccountForm";
@@ -27,10 +28,18 @@ const footerStyle = css({
   right: em(1)
 });
 
+const filterSelectStyle = css(buttonReset, {
+  border: `solid ${px(1)} #fff`,
+  padding: em(0, 0.5),
+  boxShadow: `${px(1)} ${px(2)} ${px(0)} #fff`,
+  transform: `translate(${px(-1)},${px(-2)})`
+});
+
 const ProfileView = (props: { myId: string }) => {
   const { myId } = props;
   const [account, setAccount] = useState<{ twitter: string } | null>(null);
   const [list, setList] = useState<TwitterData[] | null>(null);
+  const [filter, setFilter] = useState<"hours" | "days" | "monthes">("hours");
 
   const signOut = () => {
     firebaseSignOut(getAuth());
@@ -41,17 +50,23 @@ const ProfileView = (props: { myId: string }) => {
   };
 
   useEffect(() => {
+    setList(null);
+    const queryConstants = [limit(100), orderBy("createdAt", "desc")];
+    const d = new Date();
+    if (filter === "days" || filter === "monthes") {
+      const hour = d.getHours() + d.getTimezoneOffset() / 60 - 1;
+      queryConstants.unshift(where("hours", "==", (hour + 24) % 24));
+    }
+    if (filter === "monthes") {
+      queryConstants.unshift(where("days", "==", d.getDate()));
+    }
     return onSnapshot(
-      query(
-        accountLogCollectionRef(myId),
-        limit(100),
-        orderBy("createdAt", "desc")
-      ),
+      query(accountLogCollectionRef(myId), ...queryConstants),
       snapshot => {
         setList(snapshot.docs.map(s => parseTwitterData(s.data())));
       }
     );
-  }, [myId]);
+  }, [myId, filter]);
 
   useEffect(() => {
     return onSnapshot(accountDocumentRef(myId), snapshot => {
@@ -74,6 +89,25 @@ const ProfileView = (props: { myId: string }) => {
       <div css={footerStyle}>
         {account.twitter ? (
           <>
+            <select
+              value={filter}
+              onChange={e => {
+                const { value } = e.target;
+                if (
+                  value === "hours" ||
+                  value === "days" ||
+                  value === "monthes"
+                ) {
+                  setFilter(value);
+                }
+              }}
+              css={filterSelectStyle}
+            >
+              <option value="hours">hourly</option>
+              <option value="days">daily</option>
+              <option value="monthes">monthly</option>
+            </select>
+            &nbsp;
             <button type="button" onClick={clearAccount} css={buttonLinkStyle}>
               clear
             </button>

@@ -1,4 +1,37 @@
 {
-  "indexes": [],
+  "indexes": [
+    {
+      "collectionGroup": "log",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "days",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "hours",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "log",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "hours",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
+    }
+  ],
   "fieldOverrides": []
 }
