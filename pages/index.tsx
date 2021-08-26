@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged } from "firebase/auth";
+import { firebaseAuth } from "~/local/firebaseApp";
 import LoadingView from "~/components/LoadingView";
 import ProfileView from "~/components/ProfileView";
 import TitleView from "~/components/TitleView";
@@ -12,7 +13,7 @@ const PageIndex = () => {
   const [user, setUser] = useState<UserInfo | null>(null);
 
   useEffect(() => {
-    onAuthStateChanged(getAuth(), u => setUser({ id: u ? u.uid : "" }));
+    onAuthStateChanged(firebaseAuth(), u => setUser({ id: u ? u.uid : "" }));
   }, []);
 
   if (!user) {

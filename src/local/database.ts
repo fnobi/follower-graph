@@ -1,7 +1,19 @@
-import { collection, doc, getFirestore } from "firebase/firestore";
+import { collection, doc } from "firebase/firestore";
+import { firebaseFirestore } from "./firebaseApp";
 
-export const accountCollectionRef = () => collection(getFirestore(), "users");
+const COLLECTION_PATH_USERS = () => ["users"];
+const DOCUMNENT_PATH_USERS = (userId: string) => [
+  ...COLLECTION_PATH_USERS(),
+  userId
+];
+const COLLECTION_PATH_USERS_LOG = (userId: string) => [
+  ...DOCUMNENT_PATH_USERS(userId),
+  "log"
+];
+
+export const accountCollectionRef = () =>
+  collection(firebaseFirestore(), COLLECTION_PATH_USERS().join("/"));
 export const accountDocumentRef = (id: string) =>
-  doc(getFirestore(), accountCollectionRef().path, id);
+  doc(firebaseFirestore(), DOCUMNENT_PATH_USERS(id).join("/"));
 export const accountLogCollectionRef = (id: string) =>
-  collection(getFirestore(), accountDocumentRef(id).path, "logs");
+  collection(firebaseFirestore(), COLLECTION_PATH_USERS_LOG(id).join("/"));

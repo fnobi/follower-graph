@@ -1,7 +1,8 @@
 import { css } from "@emotion/react";
 import { percent } from "~/lib/cssUtil";
-import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { buttonLinkStyle, CUSTOM_FONT_FAMILY } from "~/local/commonCss";
+import { firebaseAuth } from "~/local/firebaseApp";
 
 const wrapperStyle = css({
   position: "fixed",
@@ -23,7 +24,7 @@ const titleStyle = css({
 const TitleView = () => {
   const signIn = () => {
     const p = new GoogleAuthProvider();
-    signInWithPopup(getAuth(), p);
+    signInWithPopup(firebaseAuth(), p);
   };
 
   return (

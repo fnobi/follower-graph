@@ -2,7 +2,7 @@ import { css } from "@emotion/react";
 import dynamic from "next/dynamic";
 import { useState, useEffect } from "react";
 import { em, px } from "~/lib/cssUtil";
-import { getAuth, signOut } from "firebase/auth";
+import { signOut } from "firebase/auth";
 import {
   deleteDoc,
   limit,
@@ -13,6 +13,7 @@ import {
 } from "firebase/firestore";
 import { accountDocumentRef, accountLogCollectionRef } from "~/local/database";
 import { buttonLinkStyle, buttonReset } from "~/local/commonCss";
+import { firebaseAuth } from "~/local/firebaseApp";
 import { parseTwitterData, TwitterData } from "~/scheme/TwitterData";
 import LoadingView from "~/components/LoadingView";
 import NewAccountForm from "~/components/NewAccountForm";
@@ -42,7 +43,7 @@ const ProfileView = (props: { myId: string }) => {
   const [filter, setFilter] = useState<"hours" | "days" | "monthes">("hours");
 
   const handleLogout = () => {
-    signOut(getAuth());
+    signOut(firebaseAuth());
   };
 
   const clearAccount = () => {
@@ -51,6 +52,7 @@ const ProfileView = (props: { myId: string }) => {
 
   useEffect(() => {
     setList(null);
+    const ref = accountLogCollectionRef(myId);
     const queryConstants = [limit(100), orderBy("createdAt", "desc")];
     const d = new Date();
     if (filter === "days" || filter === "monthes") {
@@ -60,12 +62,9 @@ const ProfileView = (props: { myId: string }) => {
     if (filter === "monthes") {
       queryConstants.unshift(where("days", "==", d.getDate()));
     }
-    return onSnapshot(
-      query(accountLogCollectionRef(myId), ...queryConstants),
-      snapshot => {
-        setList(snapshot.docs.map(s => parseTwitterData(s.data())));
-      }
-    );
+    return onSnapshot(query(ref, ...queryConstants), snapshot => {
+      setList(snapshot.docs.map(s => parseTwitterData(s.data())));
+    });
   }, [myId, filter]);
 
   useEffect(() => {
