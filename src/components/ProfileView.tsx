@@ -2,7 +2,7 @@ import { css } from "@emotion/react";
 import dynamic from "next/dynamic";
 import { useState, useEffect } from "react";
 import { em, px } from "~/lib/cssUtil";
-import { getAuth, signOut as firebaseSignOut } from "firebase/auth";
+import { getAuth, signOut } from "firebase/auth";
 import {
   deleteDoc,
   limit,
@@ -41,8 +41,8 @@ const ProfileView = (props: { myId: string }) => {
   const [list, setList] = useState<TwitterData[] | null>(null);
   const [filter, setFilter] = useState<"hours" | "days" | "monthes">("hours");
 
-  const signOut = () => {
-    firebaseSignOut(getAuth());
+  const handleLogout = () => {
+    signOut(getAuth());
   };
 
   const clearAccount = () => {
@@ -114,7 +114,7 @@ const ProfileView = (props: { myId: string }) => {
             &nbsp;
           </>
         ) : null}
-        <button type="button" onClick={signOut} css={buttonLinkStyle}>
+        <button type="button" onClick={handleLogout} css={buttonLinkStyle}>
           logout
         </button>
       </div>
