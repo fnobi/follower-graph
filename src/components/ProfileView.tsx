@@ -9,6 +9,7 @@ import {
   onSnapshot,
   orderBy,
   query,
+  QueryConstraint,
   where
 } from "firebase/firestore";
 import { accountDocumentRef, accountLogCollectionRef } from "~/local/database";
@@ -53,18 +54,21 @@ const ProfileView = (props: { myId: string }) => {
   useEffect(() => {
     setList(null);
     const ref = accountLogCollectionRef(myId);
-    const queryConstants = [limit(100), orderBy("createdAt", "desc")];
+    const queryConstants: QueryConstraint[] = [];
     const d = new Date();
     if (filter === "days" || filter === "monthes") {
       const hour = d.getHours() + d.getTimezoneOffset() / 60 - 1;
-      queryConstants.unshift(where("hours", "==", (hour + 24) % 24));
+      queryConstants.push(where("hours", "==", (hour + 24) % 24));
     }
     if (filter === "monthes") {
-      queryConstants.unshift(where("days", "==", d.getDate()));
+      queryConstants.push(where("days", "==", d.getDate()));
     }
-    return onSnapshot(query(ref, ...queryConstants), snapshot => {
-      setList(snapshot.docs.map(s => parseTwitterData(s.data())));
-    });
+    return onSnapshot(
+      query(ref, ...queryConstants, limit(100), orderBy("createdAt", "desc")),
+      snapshot => {
+        setList(snapshot.docs.map(s => parseTwitterData(s.data())));
+      }
+    );
   }, [myId, filter]);
 
   useEffect(() => {
