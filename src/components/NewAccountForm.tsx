@@ -3,7 +3,7 @@ import { setDoc } from "firebase/firestore";
 import { FormEvent, useState } from "react";
 import { em, percent } from "~/lib/cssUtil";
 import { buttonLinkStyle } from "~/local/commonCss";
-import { accountDocumentRef } from "~/local/database";
+import { twitterDocumentRef } from "~/local/database";
 
 const wrapperStyle = css({
   position: "fixed",
@@ -34,7 +34,7 @@ const NewAccountForm = (props: { myId: string }) => {
     if (!account || !myId) {
       return;
     }
-    setDoc(accountDocumentRef(myId), { twitter: account });
+    setDoc(twitterDocumentRef(myId), { twitter: account });
   };
   return (
     <form onSubmit={handleSubmit} css={wrapperStyle}>
