@@ -1,26 +1,16 @@
-import { useEffect, useState } from "react";
-import { onAuthStateChanged } from "firebase/auth";
-import { firebaseAuth } from "~/local/firebaseApp";
-import LoadingView from "~/components/LoadingView";
+import { useRouter } from "next/router";
+import TwitterListView from "~/components/TwitterListView";
 import ProfileView from "~/components/ProfileView";
-import TitleView from "~/components/TitleView";
-
-type UserInfo = {
-  id: string;
-};
 
 const PageIndex = () => {
-  const [user, setUser] = useState<UserInfo | null>(null);
-
-  useEffect(() => {
-    onAuthStateChanged(firebaseAuth(), u => setUser({ id: u ? u.uid : "" }));
-  }, []);
-
-  if (!user) {
-    return <LoadingView />;
-  }
-
-  return user.id ? <ProfileView myId={user.id} /> : <TitleView />;
+  const router = useRouter();
+  const { id: idQuery } = router.query;
+  const twitterId = String(idQuery || "");
+  return twitterId ? (
+    <ProfileView twitterId={twitterId} onBack={() => router.push("/")} />
+  ) : (
+    <TwitterListView />
+  );
 };
 
 export default PageIndex;

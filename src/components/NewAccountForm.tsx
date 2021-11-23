@@ -1,9 +1,13 @@
+import { stringify } from "querystring";
 import { css } from "@emotion/react";
-import { setDoc } from "firebase/firestore";
+import { runTransaction } from "firebase/firestore";
+import { useRouter } from "next/router";
 import { FormEvent, useState } from "react";
 import { em, percent } from "~/lib/cssUtil";
 import { buttonLinkStyle } from "~/local/commonCss";
-import { accountDocumentRef } from "~/local/database";
+import { profileFollowDocumentRef, twitterDocumentRef } from "~/local/database";
+import { useMeStore } from "~/local/useMeStore";
+import { firebaseFirestore } from "~/local/firebaseApp";
 
 const wrapperStyle = css({
   position: "fixed",
@@ -26,15 +30,26 @@ const textInputStyle = css({
   margin: em(0.5, 0, 1, 0)
 });
 
-const NewAccountForm = (props: { myId: string }) => {
-  const { myId } = props;
+const NewAccountForm = () => {
   const [account, setAccount] = useState("");
-  const handleSubmit = (e: FormEvent) => {
+  const { user } = useMeStore();
+  const router = useRouter();
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!account || !myId) {
+    if (!account || !user || !user.id) {
       return;
     }
-    setDoc(accountDocumentRef(myId), { twitter: account });
+    const twitterRef = twitterDocumentRef(account);
+    await runTransaction(firebaseFirestore(), async t => {
+      const d = await t.get(twitterRef);
+      if (!d.exists()) {
+        t.set(twitterRef, { isTracking: true, owner: user.id });
+      }
+      t.set(profileFollowDocumentRef(user.id, account), {
+        createdAt: Date.now()
+      });
+    });
+    router.push(`/?${stringify({ id: account })}`);
   };
   return (
     <form onSubmit={handleSubmit} css={wrapperStyle}>

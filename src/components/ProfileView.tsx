@@ -12,17 +12,22 @@ import {
   QueryConstraint,
   where
 } from "firebase/firestore";
-import { accountDocumentRef, accountLogCollectionRef } from "~/local/database";
+import { twitterDocumentRef, twitterLogCollectionRef } from "~/local/database";
 import { buttonLinkStyle, buttonReset } from "~/local/commonCss";
 import { firebaseAuth } from "~/local/firebaseApp";
 import { parseTwitterData, TwitterData } from "~/scheme/TwitterData";
 import LoadingView from "~/components/LoadingView";
-import NewAccountForm from "~/components/NewAccountForm";
 
 const GraphPolygonView = dynamic(
   () => import("~/components/GraphPolygonView"),
   { ssr: false }
 );
+
+const headerStyle = css({
+  position: "fixed",
+  top: em(1),
+  left: em(1)
+});
 
 const footerStyle = css({
   position: "fixed",
@@ -37,9 +42,9 @@ const filterSelectStyle = css(buttonReset, {
   transform: `translate(${px(-1)},${px(-2)})`
 });
 
-const ProfileView = (props: { myId: string }) => {
-  const { myId } = props;
-  const [account, setAccount] = useState<{ twitter: string } | null>(null);
+// eslint-disable-next-line react/require-default-props
+const ProfileView = (props: { twitterId: string; onBack?: () => void }) => {
+  const { twitterId, onBack } = props;
   const [list, setList] = useState<TwitterData[] | null>(null);
   const [filter, setFilter] = useState<"hours" | "days" | "monthes">("hours");
 
@@ -48,12 +53,12 @@ const ProfileView = (props: { myId: string }) => {
   };
 
   const clearAccount = () => {
-    deleteDoc(accountDocumentRef(myId));
+    deleteDoc(twitterDocumentRef(twitterId));
   };
 
   useEffect(() => {
     setList(null);
-    const ref = accountLogCollectionRef(myId);
+    const ref = twitterLogCollectionRef(twitterId);
     const queryConstants: QueryConstraint[] = [];
     const d = new Date();
     if (filter === "days" || filter === "monthes") {
@@ -69,28 +74,22 @@ const ProfileView = (props: { myId: string }) => {
         setList(snapshot.docs.map(s => parseTwitterData(s.data())));
       }
     );
-  }, [myId, filter]);
+  }, [twitterId, filter]);
 
-  useEffect(() => {
-    return onSnapshot(accountDocumentRef(myId), snapshot => {
-      const d = snapshot.data();
-      setAccount({ twitter: d ? d.twitter : "" });
-    });
-  }, [myId]);
-
-  if (!list || !account) {
+  if (!list) {
     return <LoadingView />;
   }
 
   return (
     <div>
-      {account.twitter ? (
-        <GraphPolygonView list={list} twitterName={account.twitter} />
-      ) : (
-        <NewAccountForm myId={myId} />
-      )}
+      <GraphPolygonView list={list} twitterName={twitterId} />
+      <div css={headerStyle}>
+        <button type="button" css={buttonLinkStyle} onClick={onBack}>
+          &lt;back
+        </button>
+      </div>
       <div css={footerStyle}>
-        {account.twitter ? (
+        {twitterId ? (
           <>
             <select
               value={filter}

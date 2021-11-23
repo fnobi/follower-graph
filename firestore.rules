@@ -8,5 +8,19 @@ service cloud.firestore {
         allow read: if request.auth.uid == userId;
       }
     }
+    match /twitters/{userId} {
+      allow read: if true;
+      allow create: if request.auth.uid != null;
+      allow delete: if request.auth.uid == resource.data.owner;
+      match /log/{logId} {
+        allow read: if request.auth.uid != null;
+      }
+    }
+    match /profiles/{userId} {
+      allow read, write: if request.auth.uid == userId;
+      match /follows/{twitterId} {
+        allow read, write: if request.auth.uid == userId;
+      }
+    }
   }
 }

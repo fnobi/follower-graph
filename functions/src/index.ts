@@ -6,22 +6,22 @@ import { TwitterData } from "./sync/scheme/TwitterData";
 
 admin.initializeApp(functions.config().firebase);
 
-const accountCollectionRef = () =>
-  admin.firestore().collection("users");
+const twitterCollectionRef = () =>
+  admin.firestore().collection("twitters");
 
-const accountDocumentRef = (id: string) =>
-  accountCollectionRef().doc(id);
+const twitterDocumentRef = (id: string) =>
+  twitterCollectionRef().doc(id);
 
-const accountLogCollectionRef = (id: string) =>
-  accountDocumentRef(id).collection("log");
+const twitterLogCollectionRef = (id: string) =>
+  twitterDocumentRef(id).collection("log");
 
-async function writeLogData(
+async function writeTwitterLogData(
     client: TwitterApiClient,
     snapshot: FirebaseFirestore.QueryDocumentSnapshot<
       FirebaseFirestore.DocumentData
     >
 ) {
-  const { twitter: name } = snapshot.data();
+  const { id: name } = snapshot;
   if (!name) {
     return;
   }
@@ -34,28 +34,50 @@ async function writeLogData(
     hours: d.getHours(),
     days: d.getDate()
   };
-  await accountLogCollectionRef(snapshot.id).doc().set(t);
+  await twitterLogCollectionRef(snapshot.id).doc().set(t);
 }
 
-exports.scheduleFetchFollowers = functions.pubsub
-    .schedule("every 1 hours")
+exports.scheduleMigrateUsersTask = functions.pubsub
+    .schedule("every 5 minutes")
     .onRun(async () => {
-      const client = new TwitterApiClient(TWITTER_BEARER_TOKEN);
-      const users = await accountCollectionRef().get();
-      await Promise.all(users.docs.map((snapshot) =>
-        writeLogData(client, snapshot)
+      const rootRef = admin.firestore().collection("users");
+      const users = await rootRef.get();
+      await Promise.all(users.docs.map(async (userSnapshot) =>{
+        const logRef = userSnapshot.ref.collection("log");
+        const logs = await logRef.limit(10).get();
+        const { twitter } = userSnapshot.data();
+        const targetRef = twitterLogCollectionRef(twitter);
+        await Promise.all(logs.docs.map(async (logSnapshot) => {
+          const d = logSnapshot.data();
+          console.log(twitter, targetRef.path, JSON.stringify(d));
+          await Promise.all([
+            targetRef.doc().set(d),
+            logSnapshot.ref.delete()
+          ]);
+        }));
+      }
       ));
     });
 
-exports.handleUserCreate = functions.firestore
-    .document("users/{userId}")
-    .onCreate(async (snapshot) => {
+exports.scheduleFetchTwitterFollowers = functions.pubsub
+    .schedule("every 1 hours")
+    .onRun(async () => {
       const client = new TwitterApiClient(TWITTER_BEARER_TOKEN);
-      await writeLogData(client, snapshot);
+      const users = await twitterCollectionRef().get();
+      await Promise.all(users.docs.map((snapshot) =>
+        writeTwitterLogData(client, snapshot)
+      ));
     });
 
-exports.handleUserDelete = functions.firestore
-    .document("users/{userId}")
+exports.handleTwitterCreate = functions.firestore
+    .document("twitters/{twitterId}")
+    .onCreate(async (snapshot) => {
+      const client = new TwitterApiClient(TWITTER_BEARER_TOKEN);
+      await writeTwitterLogData(client, snapshot);
+    });
+
+exports.handleTwitterDelete = functions.firestore
+    .document("twitters/{twitterId}")
     .onDelete(async (snapshot) => {
       const col = await snapshot.ref.collection("log").get();
       return Promise.all(col.docs.map((item) => item.ref.delete()));
