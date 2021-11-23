@@ -8,6 +8,7 @@ import { buttonLinkStyle } from "~/local/commonCss";
 import { profileFollowDocumentRef, twitterDocumentRef } from "~/local/database";
 import { useMeStore } from "~/local/useMeStore";
 import { firebaseFirestore } from "~/local/firebaseApp";
+import { TwitterAccount } from "~/scheme/TwitterAccount";
 
 const wrapperStyle = css({
   position: "fixed",
@@ -43,7 +44,8 @@ const NewAccountForm = () => {
     await runTransaction(firebaseFirestore(), async t => {
       const d = await t.get(twitterRef);
       if (!d.exists()) {
-        t.set(twitterRef, { isTracking: true, owner: user.id });
+        const p: Partial<TwitterAccount> = { isTracking: true, owner: user.id };
+        t.set(twitterRef, p);
       }
       t.set(profileFollowDocumentRef(user.id, account), {
         createdAt: Date.now()

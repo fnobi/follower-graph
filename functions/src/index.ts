@@ -2,6 +2,7 @@ import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
 import { TWITTER_BEARER_TOKEN } from "./local/config";
 import TwitterApiClient from "./local/TwitterApiClient";
+import { TwitterAccount } from "./sync/scheme/TwitterAccount";
 import { TwitterData } from "./sync/scheme/TwitterData";
 
 admin.initializeApp(functions.config().firebase);
@@ -34,7 +35,14 @@ async function writeTwitterLogData(
     hours: d.getHours(),
     days: d.getDate()
   };
-  await twitterLogCollectionRef(snapshot.id).doc().set(t);
+  const p: Partial<TwitterAccount> = {
+    name: res.name,
+    iconUrl: res.profile_image_url_https
+  };
+  await Promise.all([
+    twitterLogCollectionRef(snapshot.id).doc().set(t),
+    twitterDocumentRef(snapshot.id).set(p, { merge: true })
+  ]);
 }
 
 exports.scheduleMigrateUsersTask = functions.pubsub

@@ -10,7 +10,9 @@ type TwitterUserObject = {
     // eslint-disable-next-line camelcase
     followers_count: number;
     // eslint-disable-next-line camelcase
-    friends_count: number
+    friends_count: number,
+    // eslint-disable-next-line camelcase
+    profile_image_url_https: string
 };
 
 export default class TwitterApiClient {
