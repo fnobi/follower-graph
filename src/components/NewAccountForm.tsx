@@ -1,5 +1,7 @@
+import { stringify } from "querystring";
 import { css } from "@emotion/react";
 import { setDoc } from "firebase/firestore";
+import { useRouter } from "next/router";
 import { FormEvent, useState } from "react";
 import { em, percent } from "~/lib/cssUtil";
 import { buttonLinkStyle } from "~/local/commonCss";
@@ -26,15 +28,17 @@ const textInputStyle = css({
   margin: em(0.5, 0, 1, 0)
 });
 
-const NewAccountForm = (props: { myId: string }) => {
-  const { myId } = props;
+const NewAccountForm = () => {
   const [account, setAccount] = useState("");
-  const handleSubmit = (e: FormEvent) => {
+  const router = useRouter();
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!account || !myId) {
+    if (!account) {
       return;
     }
-    setDoc(twitterDocumentRef(myId), { twitter: account });
+    // TODO: owner登録
+    await setDoc(twitterDocumentRef(account), { isTracking: true });
+    router.push(`/?${stringify({ id: account })}`);
   };
   return (
     <form onSubmit={handleSubmit} css={wrapperStyle}>
