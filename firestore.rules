@@ -16,5 +16,11 @@ service cloud.firestore {
         allow read: if request.auth.uid != null;
       }
     }
+    match /profiles/{userId} {
+      allow read, write: if request.auth.uid == userId;
+      match /follows/{twitterId} {
+        allow read, write: if request.auth.uid == userId;
+      }
+    }
   }
 }

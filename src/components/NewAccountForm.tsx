@@ -1,11 +1,13 @@
 import { stringify } from "querystring";
 import { css } from "@emotion/react";
-import { setDoc } from "firebase/firestore";
+import { runTransaction } from "firebase/firestore";
 import { useRouter } from "next/router";
 import { FormEvent, useState } from "react";
 import { em, percent } from "~/lib/cssUtil";
 import { buttonLinkStyle } from "~/local/commonCss";
-import { twitterDocumentRef } from "~/local/database";
+import { profileFollowDocumentRef, twitterDocumentRef } from "~/local/database";
+import { useMeStore } from "~/local/useMeStore";
+import { firebaseFirestore } from "~/local/firebaseApp";
 
 const wrapperStyle = css({
   position: "fixed",
@@ -30,14 +32,23 @@ const textInputStyle = css({
 
 const NewAccountForm = () => {
   const [account, setAccount] = useState("");
+  const { user } = useMeStore();
   const router = useRouter();
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!account) {
+    if (!account || !user || !user.id) {
       return;
     }
-    // TODO: owner登録
-    await setDoc(twitterDocumentRef(account), { isTracking: true });
+    const twitterRef = twitterDocumentRef(account);
+    await runTransaction(firebaseFirestore(), async t => {
+      const d = await t.get(twitterRef);
+      if (!d.exists()) {
+        t.set(twitterRef, { isTracking: true, owner: user.id });
+      }
+      t.set(profileFollowDocumentRef(user.id, account), {
+        createdAt: Date.now()
+      });
+    });
     router.push(`/?${stringify({ id: account })}`);
   };
   return (
