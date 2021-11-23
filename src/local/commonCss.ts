@@ -7,9 +7,14 @@ export const globalStyle = css({
     backgroundColor: "#003",
     color: "#fff",
     fontFamily: "sans-serif",
-    fontSize: 16,
     lineHeight: 1.5,
-    textSizeAdjust: "100%"
+    textSizeAdjust: "100%",
+    [MQ_DESKTOP]: {
+      fontSize: pcp(48)
+    },
+    [MQ_MOBILE]: {
+      fontSize: spp(48)
+    }
   }
 });
 
@@ -60,6 +65,7 @@ export const responsiveImageTile = (
   });
 
 export const buttonLinkStyle = css(buttonReset, {
+  backgroundColor: "#003",
   border: `solid ${px(1)} #fff`,
   padding: em(0, 0.5),
   boxShadow: `${px(1)} ${px(2)} ${px(0)} #fff`,

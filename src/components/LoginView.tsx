@@ -21,7 +21,7 @@ const titleStyle = css({
   fontSize: percent(300)
 });
 
-const TitleView = () => {
+const LoginView = () => {
   const signIn = () => {
     const p = new GoogleAuthProvider();
     signInWithPopup(firebaseAuth(), p);
@@ -37,4 +37,4 @@ const TitleView = () => {
   );
 };
 
-export default TitleView;
+export default LoginView;

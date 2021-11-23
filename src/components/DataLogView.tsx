@@ -43,7 +43,7 @@ const filterSelectStyle = css(buttonReset, {
 });
 
 // eslint-disable-next-line react/require-default-props
-const ProfileView = (props: { twitterId: string; onBack?: () => void }) => {
+const DataLogView = (props: { twitterId: string; onBack?: () => void }) => {
   const { twitterId, onBack } = props;
   const [list, setList] = useState<TwitterData[] | null>(null);
   const [filter, setFilter] = useState<"hours" | "days" | "monthes">("hours");
@@ -124,4 +124,4 @@ const ProfileView = (props: { twitterId: string; onBack?: () => void }) => {
   );
 };
 
-export default ProfileView;
+export default DataLogView;
