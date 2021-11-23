@@ -36,7 +36,7 @@ const footerStyle = css({
   right: em(1)
 });
 
-const TwitterListView = () => {
+const FollowListView = () => {
   const router = useRouter();
   const { user } = useMeStore();
   const [twtterList, setTwtterList] = useState<string[]>([]);
@@ -87,4 +87,4 @@ const TwitterListView = () => {
   );
 };
 
-export default TwitterListView;
+export default FollowListView;

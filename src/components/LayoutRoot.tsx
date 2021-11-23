@@ -3,7 +3,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { firebaseAuth } from "~/local/firebaseApp";
 import { useMeStore } from "~/local/useMeStore";
 import LoadingView from "~/components/LoadingView";
-import TitleView from "~/components/TitleView";
+import LoginView from "~/components/LoginView";
 
 const LayoutRoot: FC = ({ children }) => {
   const { user, setUser } = useMeStore();
@@ -16,7 +16,7 @@ const LayoutRoot: FC = ({ children }) => {
     return <LoadingView />;
   }
   if (!user.id) {
-    return <TitleView />;
+    return <LoginView />;
   }
 
   return <div>{children}</div>;

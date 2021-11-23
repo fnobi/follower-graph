@@ -1,15 +1,15 @@
 import { useRouter } from "next/router";
-import TwitterListView from "~/components/TwitterListView";
-import ProfileView from "~/components/ProfileView";
+import FollowListView from "~/components/FollowListView";
+import DataLogView from "~/components/DataLogView";
 
 const PageIndex = () => {
   const router = useRouter();
   const { id: idQuery } = router.query;
   const twitterId = String(idQuery || "");
   return twitterId ? (
-    <ProfileView twitterId={twitterId} onBack={() => router.push("/")} />
+    <DataLogView twitterId={twitterId} onBack={() => router.push("/")} />
   ) : (
-    <TwitterListView />
+    <FollowListView />
   );
 };
 
