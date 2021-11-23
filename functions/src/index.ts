@@ -6,15 +6,6 @@ import { TwitterData } from "./sync/scheme/TwitterData";
 
 admin.initializeApp(functions.config().firebase);
 
-const accountCollectionRef = () =>
-  admin.firestore().collection("users");
-
-const accountDocumentRef = (id: string) =>
-  accountCollectionRef().doc(id);
-
-const accountLogCollectionRef = (id: string) =>
-  accountDocumentRef(id).collection("log");
-
 const twitterCollectionRef = () =>
   admin.firestore().collection("twitters");
 
@@ -23,28 +14,6 @@ const twitterDocumentRef = (id: string) =>
 
 const twitterLogCollectionRef = (id: string) =>
   twitterDocumentRef(id).collection("log");
-
-async function writeLogData(
-    client: TwitterApiClient,
-    snapshot: FirebaseFirestore.QueryDocumentSnapshot<
-      FirebaseFirestore.DocumentData
-    >
-) {
-  const { twitter: name } = snapshot.data();
-  if (!name) {
-    return;
-  }
-  const res = await client.showUser(name);
-  const d = new Date();
-  const t: TwitterData = {
-    createdAt: d.getTime(),
-    followersCount: res.followers_count,
-    friendsCount: res.friends_count,
-    hours: d.getHours(),
-    days: d.getDate()
-  };
-  await accountLogCollectionRef(snapshot.id).doc().set(t);
-}
 
 async function writeTwitterLogData(
     client: TwitterApiClient,
@@ -67,30 +36,6 @@ async function writeTwitterLogData(
   };
   await twitterLogCollectionRef(snapshot.id).doc().set(t);
 }
-
-exports.scheduleFetchFollowers = functions.pubsub
-    .schedule("every 1 hours")
-    .onRun(async () => {
-      const client = new TwitterApiClient(TWITTER_BEARER_TOKEN);
-      const users = await accountCollectionRef().get();
-      await Promise.all(users.docs.map((snapshot) =>
-        writeLogData(client, snapshot)
-      ));
-    });
-
-exports.handleUserCreate = functions.firestore
-    .document("users/{userId}")
-    .onCreate(async (snapshot) => {
-      const client = new TwitterApiClient(TWITTER_BEARER_TOKEN);
-      await writeLogData(client, snapshot);
-    });
-
-exports.handleUserDelete = functions.firestore
-    .document("users/{userId}")
-    .onDelete(async (snapshot) => {
-      const col = await snapshot.ref.collection("log").get();
-      return Promise.all(col.docs.map((item) => item.ref.delete()));
-    });
 
 exports.scheduleFetchTwitterFollowers = functions.pubsub
     .schedule("every 1 hours")
