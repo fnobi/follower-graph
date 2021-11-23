@@ -12,9 +12,14 @@ import {
   QueryConstraint,
   where
 } from "firebase/firestore";
-import { twitterDocumentRef, twitterLogCollectionRef } from "~/local/database";
+import { useRouter } from "next/router";
+import {
+  profileFollowDocumentRef,
+  twitterLogCollectionRef
+} from "~/local/database";
 import { buttonLinkStyle, buttonReset } from "~/local/commonCss";
 import { firebaseAuth } from "~/local/firebaseApp";
+import { useMeStore } from "~/local/useMeStore";
 import { parseTwitterData, TwitterData } from "~/scheme/TwitterData";
 import LoadingView from "~/components/LoadingView";
 
@@ -45,6 +50,8 @@ const filterSelectStyle = css(buttonReset, {
 // eslint-disable-next-line react/require-default-props
 const DataLogView = (props: { twitterId: string; onBack?: () => void }) => {
   const { twitterId, onBack } = props;
+  const router = useRouter();
+  const { user } = useMeStore();
   const [list, setList] = useState<TwitterData[] | null>(null);
   const [filter, setFilter] = useState<"hours" | "days" | "monthes">("hours");
 
@@ -52,8 +59,12 @@ const DataLogView = (props: { twitterId: string; onBack?: () => void }) => {
     signOut(firebaseAuth());
   };
 
-  const clearAccount = () => {
-    deleteDoc(twitterDocumentRef(twitterId));
+  const unfollowAccount = async () => {
+    if (!user || !user.id) {
+      return;
+    }
+    await deleteDoc(profileFollowDocumentRef(user.id, twitterId));
+    router.push("/");
   };
 
   useEffect(() => {
@@ -110,8 +121,12 @@ const DataLogView = (props: { twitterId: string; onBack?: () => void }) => {
               <option value="monthes">monthly</option>
             </select>
             &nbsp;
-            <button type="button" onClick={clearAccount} css={buttonLinkStyle}>
-              clear
+            <button
+              type="button"
+              onClick={unfollowAccount}
+              css={buttonLinkStyle}
+            >
+              unfollow
             </button>
             &nbsp;
           </>
