@@ -6,7 +6,11 @@ import { css } from "@emotion/react";
 import { em, percent } from "~/lib/cssUtil";
 import { signOut } from "firebase/auth";
 import { profileFollowCollectionRef } from "~/local/database";
-import { buttonLinkStyle, buttonReset } from "~/local/commonCss";
+import {
+  buttonLinkStyle,
+  buttonReset,
+  CUSTOM_FONT_FAMILY
+} from "~/local/commonCss";
 import { useMeStore } from "~/local/useMeStore";
 import { firebaseAuth } from "~/local/firebaseApp";
 
@@ -21,6 +25,11 @@ const wrapperStyle = css({
   width: percent(100),
   height: percent(100),
   textAlign: "center"
+});
+
+const titleStyle = css({
+  fontFamily: CUSTOM_FONT_FAMILY,
+  fontSize: percent(300)
 });
 
 const followItemCellStyle = css({
@@ -55,7 +64,7 @@ const FollowListView = () => {
 
   return (
     <div css={wrapperStyle}>
-      {/* TODO: ルックをまともにする・タイトルをここにもいれる */}
+      <h1 css={titleStyle}>follower graph</h1>
       <ul>
         {[...twtterList].map(id => (
           <li key={id} css={followItemCellStyle}>

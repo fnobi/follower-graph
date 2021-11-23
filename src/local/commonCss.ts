@@ -7,9 +7,14 @@ export const globalStyle = css({
     backgroundColor: "#003",
     color: "#fff",
     fontFamily: "sans-serif",
-    fontSize: 16,
     lineHeight: 1.5,
-    textSizeAdjust: "100%"
+    textSizeAdjust: "100%",
+    [MQ_DESKTOP]: {
+      fontSize: pcp(48)
+    },
+    [MQ_MOBILE]: {
+      fontSize: spp(48)
+    }
   }
 });
 

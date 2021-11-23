@@ -1,5 +1,5 @@
 const SP_VIEWPORT_SIZE = 1125;
-const PC_VIEWPORT_SIZE = 1920;
+const PC_VIEWPORT_SIZE = 3840;
 
 const appendPostfix = (nums: number[], postfix: string) => {
   return nums.map<string>(n => `${n}${postfix}`).join(" ");
