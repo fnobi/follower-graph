@@ -65,6 +65,7 @@ export const responsiveImageTile = (
   });
 
 export const buttonLinkStyle = css(buttonReset, {
+  backgroundColor: "#003",
   border: `solid ${px(1)} #fff`,
   padding: em(0, 0.5),
   boxShadow: `${px(1)} ${px(2)} ${px(0)} #fff`,
