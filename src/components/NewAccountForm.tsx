@@ -2,9 +2,9 @@ import { stringify } from "querystring";
 import { css } from "@emotion/react";
 import { runTransaction } from "firebase/firestore";
 import { useRouter } from "next/router";
-import { FormEvent, useState } from "react";
-import { em, percent } from "~/lib/cssUtil";
-import { buttonLinkStyle } from "~/local/commonCss";
+import { FormEvent, useMemo, useState } from "react";
+import { percent, spp } from "~/lib/cssUtil";
+import { buttonLinkStyle, CUSTOM_FONT_FAMILY } from "~/local/commonCss";
 import { profileFollowDocumentRef, twitterDocumentRef } from "~/local/database";
 import { useMeStore } from "~/local/useMeStore";
 import { firebaseFirestore } from "~/local/firebaseApp";
@@ -24,17 +24,37 @@ const wrapperStyle = css({
 });
 
 const titleStyle = css({
-  fontWeight: "bold"
+  fontWeight: "bold",
+  fontSize: percent(150)
 });
 
 const textInputStyle = css({
-  margin: em(0.5, 0, 1, 0)
+  marginTop: spp(48),
+  input: {
+    width: spp(955),
+    fontSize: "inherit"
+  }
+});
+
+const previewStyle = css({
+  marginTop: spp(32),
+  marginBottom: spp(48),
+  fontFamily: CUSTOM_FONT_FAMILY,
+  fontSize: percent(150)
 });
 
 const NewAccountForm = () => {
-  const [account, setAccount] = useState("");
   const { user } = useMeStore();
   const router = useRouter();
+  const [editing, setEditing] = useState("");
+  const account = useMemo(() => {
+    const matchData = editing.match(/[a-zA-z0-9_]+$/);
+    if (!matchData) {
+      return "";
+    }
+    return matchData[0];
+  }, [editing]);
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!account || !user || !user.id) {
@@ -56,15 +76,22 @@ const NewAccountForm = () => {
   return (
     <form onSubmit={handleSubmit} css={wrapperStyle}>
       <h2 css={titleStyle}>register new account</h2>
+      <p>type twitter profile url or screen name.</p>
       <p css={textInputStyle}>
         <input
           type="text"
-          value={account}
-          onChange={e => setAccount(e.target.value)}
+          value={editing}
+          onChange={e => setEditing(e.target.value)}
         />
       </p>
+      <p css={previewStyle}>{account ? <>@{account}</> : "-"}</p>
       <p>
-        <input type="submit" value="ok" css={buttonLinkStyle} />
+        <input
+          type="submit"
+          value="ok"
+          css={buttonLinkStyle}
+          disabled={!account}
+        />
       </p>
     </form>
   );
