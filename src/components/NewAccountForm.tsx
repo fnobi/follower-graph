@@ -3,7 +3,8 @@ import { css } from "@emotion/react";
 import { runTransaction } from "firebase/firestore";
 import { useRouter } from "next/router";
 import { FormEvent, useMemo, useState } from "react";
-import { percent, spp } from "~/lib/cssUtil";
+import { pcp, percent, spp } from "~/lib/cssUtil";
+import { MQ_DESKTOP, MQ_MOBILE } from "~/lib/MQ";
 import { buttonLinkStyle, CUSTOM_FONT_FAMILY } from "~/local/commonCss";
 import { profileFollowDocumentRef, twitterDocumentRef } from "~/local/database";
 import { useMeStore } from "~/local/useMeStore";
@@ -29,18 +30,34 @@ const titleStyle = css({
 });
 
 const textInputStyle = css({
-  marginTop: spp(48),
   input: {
-    width: spp(955),
     fontSize: "inherit"
+  },
+  [MQ_MOBILE]: {
+    marginTop: spp(48),
+    input: {
+      width: spp(955)
+    }
+  },
+  [MQ_DESKTOP]: {
+    marginTop: pcp(48),
+    input: {
+      width: pcp(955)
+    }
   }
 });
 
 const previewStyle = css({
-  marginTop: spp(32),
-  marginBottom: spp(48),
   fontFamily: CUSTOM_FONT_FAMILY,
-  fontSize: percent(150)
+  fontSize: percent(150),
+  [MQ_MOBILE]: {
+    marginTop: spp(32),
+    marginBottom: spp(48)
+  },
+  [MQ_MOBILE]: {
+    marginTop: pcp(32),
+    marginBottom: pcp(48)
+  }
 });
 
 const NewAccountForm = () => {

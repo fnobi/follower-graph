@@ -4,8 +4,9 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import { onSnapshot, query, orderBy } from "firebase/firestore";
 import { css } from "@emotion/react";
-import { em, percent, px, spp } from "~/lib/cssUtil";
+import { em, pcp, percent, px, spp } from "~/lib/cssUtil";
 import { signOut } from "firebase/auth";
+import { MQ_DESKTOP, MQ_MOBILE } from "~/lib/MQ";
 import {
   profileFollowCollectionRef,
   twitterDocumentRef
@@ -33,7 +34,9 @@ const contentStyle = css({
   alignItems: "center",
   justifyContent: "center",
   flexDirection: "column",
-  margin: spp(150, 0)
+  [MQ_MOBILE]: {
+    margin: spp(150, 0)
+  }
 });
 
 const titleStyle = css({
@@ -41,8 +44,23 @@ const titleStyle = css({
   fontSize: percent(300)
 });
 
+const listWrapperStyle = css({
+  [MQ_DESKTOP]: {
+    display: "flex",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    flexWrap: "wrap",
+    rowGap: pcp(80),
+    columnGap: pcp(80),
+    width: pcp(2500),
+    marginBottom: pcp(80)
+  }
+});
+
 const followItemCellStyle = css({
-  marginBottom: spp(40)
+  [MQ_MOBILE]: {
+    marginBottom: spp(40)
+  }
 });
 
 const footerStyle = css({
@@ -58,7 +76,6 @@ const accountCellStyle = css({
   display: "flex",
   justifyContent: "flex-start",
   alignItems: "center",
-  width: spp(955),
   border: `solid ${px(1)} #fff`,
   textAlign: "left",
   boxShadow: `${px(1)} ${px(2)} ${px(0)} #fff`,
@@ -67,25 +84,39 @@ const accountCellStyle = css({
     boxShadow: "none",
     cursor: "pointer",
     transform: `translate(${px(0)},${px(0)})`
+  },
+  [MQ_MOBILE]: {
+    width: spp(955)
+  },
+  [MQ_DESKTOP]: {
+    width: pcp(1200)
   }
 });
 
 const cellIconStyle = css({
-  minWidth: spp(160),
-  minHeight: spp(160),
   backgroundRepeat: "no-repeat",
   backgroundSize: "cover",
-  backgroundPosition: "center"
+  backgroundPosition: "center",
+  [MQ_MOBILE]: {
+    minWidth: spp(160),
+    minHeight: spp(160)
+  },
+  [MQ_DESKTOP]: {
+    minWidth: pcp(320),
+    minHeight: pcp(320)
+  }
 });
 
 const cellTextStyle = css({
   padding: em(0, 0.5),
-  fontSize: spp(32),
   strong: {
     display: "block",
     fontFamily: CUSTOM_FONT_FAMILY,
-    fontSize: percent(200),
-    wordBreak: "break-word"
+    wordBreak: "break-word",
+    fontSize: percent(200)
+  },
+  [MQ_MOBILE]: {
+    fontSize: spp(32)
   }
 });
 
@@ -148,7 +179,7 @@ const FollowListView = () => {
     <div css={wrapperStyle}>
       <div css={contentStyle}>
         <h1 css={titleStyle}>follower graph</h1>
-        <ul>
+        <ul css={listWrapperStyle}>
           {[...twtterList].map(id => (
             <li key={id} css={followItemCellStyle}>
               <AccountCell id={id} />
