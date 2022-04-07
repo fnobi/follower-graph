@@ -1,4 +1,4 @@
-import got from "got";
+import axios from "axios";
 
 type TwitterUserObject = {
     id: number;
@@ -18,6 +18,8 @@ type TwitterUserObject = {
 type TwitterEntryObject = {
   id:string;
   text:string;
+    // eslint-disable-next-line camelcase
+  created_at:string;
 };
 
 export default class TwitterApiClient {
@@ -29,21 +31,23 @@ export default class TwitterApiClient {
       this.bearerToken = bearerToken;
     }
 
-    private callApi<T=unknown>(
+    private async callApi<T=unknown>(
         path: string,
-        searchParams: {[key:string]:string}
+        params: {[key:string]:string} = {}
     ) {
-      return got
-          .get(`${TwitterApiClient.API_ORIGIN}${path}`, {
-            searchParams,
-            headers: {
-              "Authorization": `Bearer ${this.bearerToken}`
-            }
-          })
-          .json<T>();
+      const res = await axios.get<T>(`${TwitterApiClient.API_ORIGIN}${path}`, {
+        params,
+        headers: {
+          "Authorization": `Bearer ${this.bearerToken}`
+        }
+      }).catch((e) => {
+        console.error(JSON.stringify(e.response));
+        return null;
+      });
+      return res ? res.data : null;
     }
 
-    public searchRecentTweet(query:string): Promise<unknown> {
+    public searchRecentTweet(query:string) {
       return this.callApi(
           "/2/tweets/search/recent",
           {
@@ -52,7 +56,7 @@ export default class TwitterApiClient {
       );
     }
 
-    public showUser(screenName:string): Promise<TwitterUserObject> {
+    public showUser(screenName:string) {
       return this.callApi<TwitterUserObject>(
           "/1.1/users/show.json",
           {
@@ -63,7 +67,11 @@ export default class TwitterApiClient {
 
     public showUserTweets(id:string) {
       return this.callApi<{data: TwitterEntryObject[]}>(
-          `/2/users/${id}tweets`, {}
+          `/2/users/${id}/tweets`,
+          {
+            "tweet.fields": "created_at",
+            "exclude": "retweets,replies"
+          }
       );
     }
 }
