@@ -1,11 +1,10 @@
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
-import * as express from "express";
 import { TWITTER_BEARER_TOKEN } from "./local/config";
 import TwitterApiClient from "./local/TwitterApiClient";
 import { TwitterAccount } from "./sync/scheme/TwitterAccount";
 import { TwitterData } from "./sync/scheme/TwitterData";
-import { parseTwitterEntry, TwitterEntry } from "./sync/scheme/TwitterEntry";
+import { TwitterEntry } from "./sync/scheme/TwitterEntry";
 
 admin.initializeApp(functions.config().firebase);
 
@@ -119,22 +118,3 @@ exports.handleTwitterDelete = functions.firestore
       const col = await snapshot.ref.collection("log").get();
       return Promise.all(col.docs.map((item) => item.ref.delete()));
     });
-
-const apiApp = express();
-
-apiApp.get("/tweet/:id", async (req, res) => {
-  const { id } = req.params;
-  if (!id) {
-    res.send({ status: "ng", error: "no id." });
-    return;
-  }
-  const client = new TwitterApiClient(TWITTER_BEARER_TOKEN);
-  const result = await writeTwitterLogData(client, { id });
-  if (!result) {
-    res.send({ status: "ng", error: "api error." });
-    return;
-  }
-  res.send({ status: "ok", id, result });
-});
-
-exports.api = functions.https.onRequest(apiApp);
