@@ -40,6 +40,12 @@ const footerStyle = css({
   right: em(1)
 });
 
+const entryInfoStyle = css({
+  position: "absolute",
+  right: em(0),
+  top: em(0)
+});
+
 const filterSelectStyle = css(buttonReset, {
   border: `solid ${px(1)} #fff`,
   padding: em(0, 0.5),
@@ -54,6 +60,7 @@ const DataLogView = (props: { twitterId: string; onBack?: () => void }) => {
   const { user } = useMeStore();
   const [list, setList] = useState<TwitterData[] | null>(null);
   const [filter, setFilter] = useState<"hours" | "days" | "monthes">("hours");
+  const [entryId, setEntryId] = useState("");
 
   const handleLogout = () => {
     signOut(firebaseAuth());
@@ -93,7 +100,16 @@ const DataLogView = (props: { twitterId: string; onBack?: () => void }) => {
 
   return (
     <div>
-      <GraphPolygonView list={list} twitterName={twitterId} />
+      <GraphPolygonView
+        list={list}
+        twitterName={twitterId}
+        onEntry={setEntryId}
+      />
+      {entryId ? (
+        <div key={entryId} css={entryInfoStyle}>
+          {entryId}
+        </div>
+      ) : null}
       <div css={headerStyle}>
         <button type="button" css={buttonLinkStyle} onClick={onBack}>
           &lt;back

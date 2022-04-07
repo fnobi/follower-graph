@@ -29,6 +29,8 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
 
   private twitterName: string = "";
 
+  private entryListener: (id: string) => void = () => {};
+
   public constructor() {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
@@ -46,10 +48,20 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
 
   public setScroll(num: number) {
     this.scroll = clamp(0, 1, num);
+    const focusIndex = Math.round(this.scroll * (this.list.length - 1));
+    const focusItem = this.list[focusIndex];
+    const [latestEntry] = focusItem.recentTweets;
+    if (latestEntry) {
+      this.entryListener(latestEntry);
+    }
   }
 
   public scrollBy(delta: number) {
     this.setScroll(this.scroll + delta);
+  }
+
+  public setEntryListener(fn: (id: string) => void) {
+    this.entryListener = fn;
   }
 
   private render() {

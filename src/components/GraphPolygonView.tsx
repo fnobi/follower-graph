@@ -24,8 +24,9 @@ const canvasStyle = css({
 const GraphPolygonView = (props: {
   list: TwitterData[];
   twitterName: string;
+  onEntry: (id: string) => void;
 }) => {
-  const { list, twitterName } = props;
+  const { list, twitterName, onEntry } = props;
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const { playerRef } = useCanvasAgent({
     initializer: () => new GraphPolygonPlayer(),
@@ -61,6 +62,13 @@ const GraphPolygonView = (props: {
       player.setList(list);
     }
   }, [list]);
+
+  useEffect(() => {
+    const { current: player } = playerRef;
+    if (player) {
+      player.setEntryListener(onEntry);
+    }
+  }, [onEntry]);
 
   useEffect(() => {
     const { current: player } = playerRef;
