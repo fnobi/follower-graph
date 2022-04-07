@@ -36,6 +36,7 @@ async function writeTwitterLogData(
     days: d.getDate()
   };
   const p: Partial<TwitterAccount> = {
+    id: res.id_str,
     name: res.name,
     iconUrl: res.profile_image_url_https
   };
