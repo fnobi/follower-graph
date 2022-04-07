@@ -5,6 +5,7 @@ import { TWITTER_BEARER_TOKEN } from "./local/config";
 import TwitterApiClient from "./local/TwitterApiClient";
 import { TwitterAccount } from "./sync/scheme/TwitterAccount";
 import { TwitterData } from "./sync/scheme/TwitterData";
+import { parseTwitterEntry, TwitterEntry } from "./sync/scheme/TwitterEntry";
 
 admin.initializeApp(functions.config().firebase);
 
@@ -57,9 +58,14 @@ async function writeTwitterLogData(
   await Promise.all([
     twitterLogCollectionRef(opts.id).doc().set(log),
     twitterDocumentRef(opts.id).set(profile, { merge: true }),
-    ...entryRes.data.map((e) =>
-      entryDocumentRef(e.id).set(e)
-    )
+    ...entryRes.data.map((e) =>{
+      const ent: TwitterEntry = {
+        id: e.id,
+        text: e.text,
+        createdAt: e.created_at
+      };
+      return entryDocumentRef(e.id).set(ent);
+    })
   ]);
   return {
     log,
