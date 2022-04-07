@@ -1,18 +1,20 @@
 import { CanvasPlayer } from "~/lib/useCanvasAgent";
 import { minBy, maxBy, mix, padLeft, clamp } from "~/lib/lodashLike";
+import { px } from "~/lib/cssUtil";
 import { CUSTOM_FONT_FAMILY } from "~/local/commonCss";
 import { TwitterData } from "~/scheme/TwitterData";
 
 const VIEWPORT = 450;
-const SIZE_MIN = 100;
-const SIZE_MAX = 200;
+const GRAPH_HEIGHT = 80;
 const DOT_SIZE = 4;
-const MIN_SPLIT_COUNT = 6;
 const FONT_SIZE = 45;
+const HIGHLIGHT_PADDING = 10;
+const SCROLL_GRAPH_UNIT = 10;
+const SCROLL_GRAPH_OFFSET_Y = 120;
+const STATIC_GRAPH_OFFSET_Y = -120;
 
-const makeFont = (size: number) => {
-  return `${size}px/${size}px ${CUSTOM_FONT_FAMILY}`;
-};
+const makeFont = (size: number) =>
+  [[px(size), px(size)].join("/"), CUSTOM_FONT_FAMILY].join(" ");
 
 export default class GraphPolygonPlayer implements CanvasPlayer {
   public readonly canvas: HTMLCanvasElement;
@@ -70,49 +72,84 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
         this.list,
         item => item.followersCount
       );
-      const splitCount = Math.max(MIN_SPLIT_COUNT, this.list.length);
-      const scrollOffset = ((this.list.length - 1) / splitCount) * scroll;
-      const points = this.list.map(({ followersCount: count }, i) => {
-        const a = Math.PI * 2 * (i / splitCount - scrollOffset);
-        const size = mix(
-          SIZE_MIN,
-          SIZE_MAX,
-          minCount === maxCount
-            ? 0.5
-            : (count - minCount) / (maxCount - minCount)
-        );
-        const x = Math.cos(a) * size;
-        const y = Math.sin(a) * size;
-        return { x, y };
-      });
+      const scrollLength = (this.list.length - 1) * SCROLL_GRAPH_UNIT;
+      const scrollOffset = scrollLength * scroll;
+      const vw = canvas.width / this.scale;
+      const cc = this.list.length - 1;
+      const mc = this.list.length + 1;
+      const staticGraphRight = (0.5 - 1 / mc) * vw;
+      const staticGraphLength = (vw / mc) * cc;
+      const highlightWidth = (staticGraphLength * vw) / scrollLength;
+
+      const ys = this.list.map(({ followersCount: count }) =>
+        minCount === maxCount ? 0.5 : (count - minCount) / (maxCount - minCount)
+      );
+      const points1 = ys.map((y, i) => ({
+        x: -i * SCROLL_GRAPH_UNIT + scrollOffset,
+        y: mix(GRAPH_HEIGHT, 0, y) - GRAPH_HEIGHT * 0.5
+      }));
+      const points2 = ys.map((y, i) => ({
+        x: staticGraphRight - (vw / mc) * i,
+        y: mix(GRAPH_HEIGHT, 0, y) - GRAPH_HEIGHT * 0.5
+      }));
       const focusIndex = Math.round(scroll * (this.list.length - 1));
       const focusItem = this.list[focusIndex];
 
-      if (points.length > 1) {
-        ctx.beginPath();
-        points.forEach(({ x, y }, i) => {
-          if (i) {
-            ctx.lineTo(x, y);
-          } else {
-            ctx.moveTo(x, y);
-          }
-        });
-        ctx.stroke();
+      [
+        {
+          points: points1,
+          offsetY: SCROLL_GRAPH_OFFSET_Y,
+          rangeStart: -vw / 2,
+          rangeWidth: vw
+        },
+        {
+          points: points2,
+          offsetY: STATIC_GRAPH_OFFSET_Y,
+          rangeStart:
+            staticGraphRight - staticGraphLength * scroll - highlightWidth / 2,
+          rangeWidth: highlightWidth
+        }
+      ].forEach(({ points, offsetY, rangeStart, rangeWidth }) => {
+        ctx.save();
+        ctx.translate(0, offsetY);
 
-        points.forEach(({ x, y }, i) => {
-          if (i === focusIndex || i === 0 || i === this.list.length - 1) {
-            ctx.save();
-            ctx.fillStyle = i === focusIndex ? "#fff" : "#003";
-            ctx.beginPath();
-            ctx.arc(x, y, DOT_SIZE, 0, Math.PI * 2);
-            ctx.fill();
-            if (i !== focusIndex) {
-              ctx.stroke();
+        ctx.save();
+        ctx.fillStyle = "#008";
+        ctx.fillRect(
+          rangeStart,
+          -GRAPH_HEIGHT * 0.5 - HIGHLIGHT_PADDING,
+          rangeWidth,
+          GRAPH_HEIGHT + HIGHLIGHT_PADDING * 2
+        );
+        ctx.restore();
+
+        if (points.length > 1) {
+          ctx.beginPath();
+          points.forEach(({ x, y }, i) => {
+            if (i) {
+              ctx.lineTo(x, y);
+            } else {
+              ctx.moveTo(x, y);
             }
-            ctx.restore();
-          }
-        });
-      }
+          });
+          ctx.stroke();
+
+          points.forEach(({ x, y }, i) => {
+            if (i === focusIndex || i === 0 || i === this.list.length - 1) {
+              ctx.save();
+              ctx.fillStyle = i === focusIndex ? "#fff" : "#003";
+              ctx.beginPath();
+              ctx.arc(x, y, DOT_SIZE, 0, Math.PI * 2);
+              ctx.fill();
+              if (i !== focusIndex) {
+                ctx.stroke();
+              }
+              ctx.restore();
+            }
+          });
+        }
+        ctx.restore();
+      });
 
       if (focusItem) {
         const d = new Date(focusItem.createdAt);
