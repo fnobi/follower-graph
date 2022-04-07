@@ -1,5 +1,6 @@
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
+import * as express from "express";
 import { TWITTER_BEARER_TOKEN } from "./local/config";
 import TwitterApiClient from "./local/TwitterApiClient";
 import { TwitterAccount } from "./sync/scheme/TwitterAccount";
@@ -16,33 +17,55 @@ const twitterDocumentRef = (id: string) =>
 const twitterLogCollectionRef = (id: string) =>
   twitterDocumentRef(id).collection("log");
 
+const entryCollectionRef = () =>
+  admin.firestore().collection("entries");
+
+const entryDocumentRef = (id: string) =>
+  entryCollectionRef().doc(id);
+
 async function writeTwitterLogData(
     client: TwitterApiClient,
-    snapshot: FirebaseFirestore.QueryDocumentSnapshot<
-      FirebaseFirestore.DocumentData
-    >
+    opts: {id:string}
 ) {
-  const { id: name } = snapshot;
+  const { id: name } = opts;
   if (!name) {
     return;
   }
   const res = await client.showUser(name);
+  if (!res) {
+    return;
+  }
+  const id = res.id_str;
+  const entryRes = await client.showUserTweets(id);
+  if (!entryRes) {
+    return;
+  }
   const d = new Date();
-  const t: TwitterData = {
+  const log: TwitterData = {
     createdAt: d.getTime(),
     followersCount: res.followers_count,
     friendsCount: res.friends_count,
+    recentTweets: entryRes.data.map((t) => t.id),
     hours: d.getHours(),
     days: d.getDate()
   };
-  const p: Partial<TwitterAccount> = {
+  const profile: Partial<TwitterAccount> = {
+    id,
     name: res.name,
     iconUrl: res.profile_image_url_https
   };
   await Promise.all([
-    twitterLogCollectionRef(snapshot.id).doc().set(t),
-    twitterDocumentRef(snapshot.id).set(p, { merge: true })
+    twitterLogCollectionRef(opts.id).doc().set(log),
+    twitterDocumentRef(opts.id).set(profile, { merge: true }),
+    ...entryRes.data.map((e) =>
+      entryDocumentRef(e.id).set(e)
+    )
   ]);
+  return {
+    log,
+    profile,
+    entries: [...entryRes.data]
+  };
 }
 
 exports.scheduleMigrateUsersTask = functions.pubsub
@@ -90,3 +113,22 @@ exports.handleTwitterDelete = functions.firestore
       const col = await snapshot.ref.collection("log").get();
       return Promise.all(col.docs.map((item) => item.ref.delete()));
     });
+
+const apiApp = express();
+
+apiApp.get("/tweet/:id", async (req, res) => {
+  const { id } = req.params;
+  if (!id) {
+    res.send({ status: "ng", error: "no id." });
+    return;
+  }
+  const client = new TwitterApiClient(TWITTER_BEARER_TOKEN);
+  const result = await writeTwitterLogData(client, { id });
+  if (!result) {
+    res.send({ status: "ng", error: "api error." });
+    return;
+  }
+  res.send({ status: "ok", id, result });
+});
+
+exports.api = functions.https.onRequest(apiApp);
