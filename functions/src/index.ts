@@ -1,5 +1,6 @@
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
+import * as express from "express";
 import { TWITTER_BEARER_TOKEN } from "./local/config";
 import TwitterApiClient from "./local/TwitterApiClient";
 import { TwitterAccount } from "./sync/scheme/TwitterAccount";
@@ -103,3 +104,12 @@ exports.handleTwitterDelete = functions.firestore
       const col = await snapshot.ref.collection("log").get();
       return Promise.all(col.docs.map((item) => item.ref.delete()));
     });
+
+const apiApp = express();
+
+apiApp.get("/tweet/:id", async (req, res) => {
+  const { id } = req.params;
+  res.send({ status: "ok", id });
+});
+
+exports.api = functions.https.onRequest(apiApp);
