@@ -78,6 +78,7 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
       const mc = this.list.length + 1;
       const staticGraphRight = (0.5 - 1 / mc) * vw;
       const staticGraphLength = (vw / mc) * cc;
+      const highlightWidth = (staticGraphLength * vw) / scrollLength;
 
       const points1 = this.list.map(({ followersCount: count }, i) => {
         const size = mix(
@@ -115,9 +116,9 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
         SIZE_MAX - SIZE_MIN
       );
       ctx.fillRect(
-        staticGraphRight - staticGraphLength * scroll,
+        staticGraphRight - staticGraphLength * scroll - highlightWidth / 2,
         SIZE_MIN - STATIC_GRAPH_OFFSET_Y,
-        20,
+        highlightWidth,
         SIZE_MAX - SIZE_MIN
       );
       ctx.restore();
