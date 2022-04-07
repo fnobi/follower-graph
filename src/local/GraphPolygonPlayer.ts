@@ -48,6 +48,14 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
 
   public setScroll(num: number) {
     this.scroll = clamp(0, 1, num);
+    this.checkEntry();
+  }
+
+  public scrollBy(delta: number) {
+    this.setScroll(this.scroll + delta);
+  }
+
+  public checkEntry() {
     const focusIndex = Math.round(this.scroll * (this.list.length - 1));
     const focusItem = this.list[focusIndex];
     const [latestEntry] = focusItem.recentTweets;
@@ -56,12 +64,9 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
     }
   }
 
-  public scrollBy(delta: number) {
-    this.setScroll(this.scroll + delta);
-  }
-
   public setEntryListener(fn: (id: string) => void) {
     this.entryListener = fn;
+    this.checkEntry();
   }
 
   private render() {
