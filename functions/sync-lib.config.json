@@ -3,6 +3,7 @@
     "dest": "./src/sync",
     "files": [
         "scheme/TwitterData.ts",
-        "scheme/TwitterAccount.ts"
+        "scheme/TwitterAccount.ts",
+        "scheme/TwitterEntry.ts"
     ]
 }

@@ -16,6 +16,12 @@ const twitterDocumentRef = (id: string) =>
 const twitterLogCollectionRef = (id: string) =>
   twitterDocumentRef(id).collection("log");
 
+const entryCollectionRef = () =>
+  admin.firestore().collection("entries");
+
+const entryDocumentRef = (id: string) =>
+  entryCollectionRef().doc(id);
+
 async function writeTwitterLogData(
     client: TwitterApiClient,
     snapshot: FirebaseFirestore.QueryDocumentSnapshot<
@@ -27,22 +33,28 @@ async function writeTwitterLogData(
     return;
   }
   const res = await client.showUser(name);
+  const id = res.id_str;
+  const entryRes = await client.showUserTweets(id);
   const d = new Date();
   const t: TwitterData = {
     createdAt: d.getTime(),
     followersCount: res.followers_count,
     friendsCount: res.friends_count,
+    recentTweets: entryRes.data.map((t) => t.id),
     hours: d.getHours(),
     days: d.getDate()
   };
   const p: Partial<TwitterAccount> = {
-    id: res.id_str,
+    id,
     name: res.name,
     iconUrl: res.profile_image_url_https
   };
   await Promise.all([
     twitterLogCollectionRef(snapshot.id).doc().set(t),
-    twitterDocumentRef(snapshot.id).set(p, { merge: true })
+    twitterDocumentRef(snapshot.id).set(p, { merge: true }),
+    ...entryRes.data.map((e) =>
+      entryDocumentRef(e.id).set(e)
+    )
   ]);
 }
 

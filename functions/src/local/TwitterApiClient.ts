@@ -15,6 +15,11 @@ type TwitterUserObject = {
     profile_image_url_https: string
 };
 
+type TwitterEntryObject = {
+  id:string;
+  text:string;
+};
+
 export default class TwitterApiClient {
     private static API_ORIGIN = "https://api.twitter.com";
 
@@ -53,6 +58,12 @@ export default class TwitterApiClient {
           {
             screen_name: screenName
           }
+      );
+    }
+
+    public showUserTweets(id:string) {
+      return this.callApi<{data: TwitterEntryObject[]}>(
+          `/2/users/${id}tweets`, {}
       );
     }
 }
