@@ -9,6 +9,7 @@ const SIZE_MAX = 200;
 const DOT_SIZE = 4;
 const MIN_SPLIT_COUNT = 6;
 const FONT_SIZE = 45;
+const VERTICAL_GRAPH_UNIT = 10;
 
 const makeFont = (size: number) => {
   return `${size}px/${size}px ${CUSTOM_FONT_FAMILY}`;
@@ -85,6 +86,20 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
         const y = Math.sin(a) * size;
         return { x, y };
       });
+      const points2 = this.list.map(({ followersCount: count }, i) => {
+        const size = mix(
+          SIZE_MAX,
+          SIZE_MIN,
+          minCount === maxCount
+            ? 0.5
+            : (count - minCount) / (maxCount - minCount)
+        );
+        const x =
+          -i * VERTICAL_GRAPH_UNIT +
+          this.list.length * scroll * VERTICAL_GRAPH_UNIT;
+        const y = size;
+        return { x, y };
+      });
       const focusIndex = Math.round(scroll * (this.list.length - 1));
       const focusItem = this.list[focusIndex];
 
@@ -100,6 +115,41 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
         ctx.stroke();
 
         points.forEach(({ x, y }, i) => {
+          if (i === focusIndex || i === 0 || i === this.list.length - 1) {
+            ctx.save();
+            ctx.fillStyle = i === focusIndex ? "#fff" : "#003";
+            ctx.beginPath();
+            ctx.arc(x, y, DOT_SIZE, 0, Math.PI * 2);
+            ctx.fill();
+            if (i !== focusIndex) {
+              ctx.stroke();
+            }
+            ctx.restore();
+          }
+        });
+      }
+
+      ctx.save();
+      ctx.fillRect(
+        (scroll - 1) * this.list.length * VERTICAL_GRAPH_UNIT,
+        SIZE_MIN,
+        (points2.length - 1) * VERTICAL_GRAPH_UNIT,
+        SIZE_MAX - SIZE_MIN
+      );
+      ctx.restore();
+
+      if (points2.length > 1) {
+        ctx.beginPath();
+        points2.forEach(({ x, y }, i) => {
+          if (i) {
+            ctx.lineTo(x, y);
+          } else {
+            ctx.moveTo(x, y);
+          }
+        });
+        ctx.stroke();
+
+        points2.forEach(({ x, y }, i) => {
           if (i === focusIndex || i === 0 || i === this.list.length - 1) {
             ctx.save();
             ctx.fillStyle = i === focusIndex ? "#fff" : "#003";
