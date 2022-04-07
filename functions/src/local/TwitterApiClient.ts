@@ -18,7 +18,7 @@ type TwitterUserObject = {
 type TwitterEntryObject = {
   id:string;
   text:string;
-    // eslint-disable-next-line camelcase
+  // eslint-disable-next-line camelcase
   created_at:string;
 };
 
