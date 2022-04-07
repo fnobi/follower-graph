@@ -81,25 +81,17 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
       const staticGraphLength = (vw / mc) * cc;
       const highlightWidth = (staticGraphLength * vw) / scrollLength;
 
-      const ys = this.list.map(
-        ({ followersCount: count }) =>
-          mix(
-            GRAPH_HEIGHT,
-            0,
-            minCount === maxCount
-              ? 0.5
-              : (count - minCount) / (maxCount - minCount)
-          ) -
-          GRAPH_HEIGHT * 0.5
+      const ys = this.list.map(({ followersCount: count }) =>
+        minCount === maxCount ? 0.5 : (count - minCount) / (maxCount - minCount)
       );
-      const points1 = ys.map((y, i) => {
-        const x = -i * SCROLL_GRAPH_UNIT + scrollOffset;
-        return { x, y };
-      });
-      const points2 = ys.map((y, i) => {
-        const x = staticGraphRight - (vw / mc) * i;
-        return { x, y };
-      });
+      const points1 = ys.map((y, i) => ({
+        x: -i * SCROLL_GRAPH_UNIT + scrollOffset,
+        y: mix(GRAPH_HEIGHT, 0, y) - GRAPH_HEIGHT * 0.5
+      }));
+      const points2 = ys.map((y, i) => ({
+        x: staticGraphRight - (vw / mc) * i,
+        y: mix(GRAPH_HEIGHT, 0, y) - GRAPH_HEIGHT * 0.5
+      }));
       const focusIndex = Math.round(scroll * (this.list.length - 1));
       const focusItem = this.list[focusIndex];
 
