@@ -71,19 +71,18 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
         this.list,
         item => item.followersCount
       );
-      const splitCount = Math.max(MIN_SPLIT_COUNT, this.list.length);
-      const scrollOffset = ((this.list.length - 1) / splitCount) * scroll;
-      const points = this.list.map(({ followersCount: count }, i) => {
-        const a = Math.PI * 2 * (i / splitCount - scrollOffset);
+      const scrollLength = (this.list.length - 1) * VERTICAL_GRAPH_UNIT;
+      const scrollOffset = scrollLength * scroll;
+      const points1 = this.list.map(({ followersCount: count }, i) => {
         const size = mix(
-          SIZE_MIN,
           SIZE_MAX,
+          SIZE_MIN,
           minCount === maxCount
             ? 0.5
             : (count - minCount) / (maxCount - minCount)
         );
-        const x = Math.cos(a) * size;
-        const y = Math.sin(a) * size;
+        const x = -i * VERTICAL_GRAPH_UNIT + scrollOffset;
+        const y = size;
         return { x, y };
       });
       const points2 = this.list.map(({ followersCount: count }, i) => {
@@ -94,75 +93,50 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
             ? 0.5
             : (count - minCount) / (maxCount - minCount)
         );
-        const x =
-          -i * VERTICAL_GRAPH_UNIT +
-          this.list.length * scroll * VERTICAL_GRAPH_UNIT;
-        const y = size;
+        const vw = canvas.width / this.scale;
+        const x = ((this.list.length - i) / (this.list.length + 1) - 0.5) * vw;
+        const y = size - 300;
         return { x, y };
       });
       const focusIndex = Math.round(scroll * (this.list.length - 1));
       const focusItem = this.list[focusIndex];
 
-      if (points.length > 1) {
-        ctx.beginPath();
-        points.forEach(({ x, y }, i) => {
-          if (i) {
-            ctx.lineTo(x, y);
-          } else {
-            ctx.moveTo(x, y);
-          }
-        });
-        ctx.stroke();
-
-        points.forEach(({ x, y }, i) => {
-          if (i === focusIndex || i === 0 || i === this.list.length - 1) {
-            ctx.save();
-            ctx.fillStyle = i === focusIndex ? "#fff" : "#003";
-            ctx.beginPath();
-            ctx.arc(x, y, DOT_SIZE, 0, Math.PI * 2);
-            ctx.fill();
-            if (i !== focusIndex) {
-              ctx.stroke();
-            }
-            ctx.restore();
-          }
-        });
-      }
-
       ctx.save();
       ctx.fillRect(
-        (scroll - 1) * this.list.length * VERTICAL_GRAPH_UNIT,
+        -scrollLength + scrollOffset,
         SIZE_MIN,
-        (points2.length - 1) * VERTICAL_GRAPH_UNIT,
+        scrollLength,
         SIZE_MAX - SIZE_MIN
       );
       ctx.restore();
 
-      if (points2.length > 1) {
-        ctx.beginPath();
-        points2.forEach(({ x, y }, i) => {
-          if (i) {
-            ctx.lineTo(x, y);
-          } else {
-            ctx.moveTo(x, y);
-          }
-        });
-        ctx.stroke();
-
-        points2.forEach(({ x, y }, i) => {
-          if (i === focusIndex || i === 0 || i === this.list.length - 1) {
-            ctx.save();
-            ctx.fillStyle = i === focusIndex ? "#fff" : "#003";
-            ctx.beginPath();
-            ctx.arc(x, y, DOT_SIZE, 0, Math.PI * 2);
-            ctx.fill();
-            if (i !== focusIndex) {
-              ctx.stroke();
+      [points1, points2].forEach(points => {
+        if (points.length > 1) {
+          ctx.beginPath();
+          points.forEach(({ x, y }, i) => {
+            if (i) {
+              ctx.lineTo(x, y);
+            } else {
+              ctx.moveTo(x, y);
             }
-            ctx.restore();
-          }
-        });
-      }
+          });
+          ctx.stroke();
+
+          points.forEach(({ x, y }, i) => {
+            if (i === focusIndex || i === 0 || i === this.list.length - 1) {
+              ctx.save();
+              ctx.fillStyle = i === focusIndex ? "#fff" : "#003";
+              ctx.beginPath();
+              ctx.arc(x, y, DOT_SIZE, 0, Math.PI * 2);
+              ctx.fill();
+              if (i !== focusIndex) {
+                ctx.stroke();
+              }
+              ctx.restore();
+            }
+          });
+        }
+      });
 
       if (focusItem) {
         const d = new Date(focusItem.createdAt);
