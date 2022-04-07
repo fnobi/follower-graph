@@ -4,12 +4,13 @@ import { CUSTOM_FONT_FAMILY } from "~/local/commonCss";
 import { TwitterData } from "~/scheme/TwitterData";
 
 const VIEWPORT = 450;
-const SIZE_MIN = 100;
-const SIZE_MAX = 200;
+const GRAPH_HEIGHT = 80;
 const DOT_SIZE = 4;
 const FONT_SIZE = 45;
-const VERTICAL_GRAPH_UNIT = 10;
-const STATIC_GRAPH_OFFSET_Y = 300;
+const HIGHLIGHT_PADDING = 10;
+const SCROLL_GRAPH_UNIT = 10;
+const SCROLL_GRAPH_OFFSET_Y = 120;
+const STATIC_GRAPH_OFFSET_Y = -120;
 
 const makeFont = (size: number) => {
   return `${size}px/${size}px ${CUSTOM_FONT_FAMILY}`;
@@ -71,7 +72,7 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
         this.list,
         item => item.followersCount
       );
-      const scrollLength = (this.list.length - 1) * VERTICAL_GRAPH_UNIT;
+      const scrollLength = (this.list.length - 1) * SCROLL_GRAPH_UNIT;
       const scrollOffset = scrollLength * scroll;
       const vw = canvas.width / this.scale;
       const cc = this.list.length - 1;
@@ -81,45 +82,49 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
       const highlightWidth = (staticGraphLength * vw) / scrollLength;
 
       const points1 = this.list.map(({ followersCount: count }, i) => {
-        const size = mix(
-          SIZE_MAX,
-          SIZE_MIN,
-          minCount === maxCount
-            ? 0.5
-            : (count - minCount) / (maxCount - minCount)
-        );
-        const x = -i * VERTICAL_GRAPH_UNIT + scrollOffset;
-        const y = size;
+        const x = -i * SCROLL_GRAPH_UNIT + scrollOffset;
+        const y =
+          mix(
+            GRAPH_HEIGHT,
+            0,
+            minCount === maxCount
+              ? 0.5
+              : (count - minCount) / (maxCount - minCount)
+          ) +
+          SCROLL_GRAPH_OFFSET_Y -
+          GRAPH_HEIGHT * 0.5;
         return { x, y };
       });
       const points2 = this.list.map(({ followersCount: count }, i) => {
-        const size = mix(
-          SIZE_MAX,
-          SIZE_MIN,
-          minCount === maxCount
-            ? 0.5
-            : (count - minCount) / (maxCount - minCount)
-        );
         const x = staticGraphRight - (vw / mc) * i;
-        const y = size - STATIC_GRAPH_OFFSET_Y;
+        const y =
+          mix(
+            GRAPH_HEIGHT,
+            0,
+            minCount === maxCount
+              ? 0.5
+              : (count - minCount) / (maxCount - minCount)
+          ) +
+          STATIC_GRAPH_OFFSET_Y -
+          GRAPH_HEIGHT * 0.5;
         return { x, y };
       });
       const focusIndex = Math.round(scroll * (this.list.length - 1));
       const focusItem = this.list[focusIndex];
 
       ctx.save();
-      ctx.fillStyle = "#888";
+      ctx.fillStyle = "#008";
       ctx.fillRect(
-        -scrollLength + scrollOffset,
-        SIZE_MIN,
-        scrollLength,
-        SIZE_MAX - SIZE_MIN
+        -vw / 2,
+        SCROLL_GRAPH_OFFSET_Y - GRAPH_HEIGHT * 0.5 - HIGHLIGHT_PADDING,
+        vw,
+        GRAPH_HEIGHT + HIGHLIGHT_PADDING * 2
       );
       ctx.fillRect(
         staticGraphRight - staticGraphLength * scroll - highlightWidth / 2,
-        SIZE_MIN - STATIC_GRAPH_OFFSET_Y,
+        STATIC_GRAPH_OFFSET_Y - GRAPH_HEIGHT * 0.5 - HIGHLIGHT_PADDING,
         highlightWidth,
-        SIZE_MAX - SIZE_MIN
+        GRAPH_HEIGHT + HIGHLIGHT_PADDING * 2
       );
       ctx.restore();
 
