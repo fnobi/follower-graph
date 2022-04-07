@@ -7,9 +7,9 @@ const VIEWPORT = 450;
 const SIZE_MIN = 100;
 const SIZE_MAX = 200;
 const DOT_SIZE = 4;
-const MIN_SPLIT_COUNT = 6;
 const FONT_SIZE = 45;
 const VERTICAL_GRAPH_UNIT = 10;
+const STATIC_GRAPH_OFFSET_Y = 300;
 
 const makeFont = (size: number) => {
   return `${size}px/${size}px ${CUSTOM_FONT_FAMILY}`;
@@ -73,6 +73,12 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
       );
       const scrollLength = (this.list.length - 1) * VERTICAL_GRAPH_UNIT;
       const scrollOffset = scrollLength * scroll;
+      const vw = canvas.width / this.scale;
+      const cc = this.list.length - 1;
+      const mc = this.list.length + 1;
+      const staticGraphRight = (0.5 - 1 / mc) * vw;
+      const staticGraphLength = (vw / mc) * cc;
+
       const points1 = this.list.map(({ followersCount: count }, i) => {
         const size = mix(
           SIZE_MAX,
@@ -93,19 +99,25 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
             ? 0.5
             : (count - minCount) / (maxCount - minCount)
         );
-        const vw = canvas.width / this.scale;
-        const x = ((this.list.length - i) / (this.list.length + 1) - 0.5) * vw;
-        const y = size - 300;
+        const x = staticGraphRight - (vw / mc) * i;
+        const y = size - STATIC_GRAPH_OFFSET_Y;
         return { x, y };
       });
       const focusIndex = Math.round(scroll * (this.list.length - 1));
       const focusItem = this.list[focusIndex];
 
       ctx.save();
+      ctx.fillStyle = "#888";
       ctx.fillRect(
         -scrollLength + scrollOffset,
         SIZE_MIN,
         scrollLength,
+        SIZE_MAX - SIZE_MIN
+      );
+      ctx.fillRect(
+        staticGraphRight - staticGraphLength * scroll,
+        SIZE_MIN - STATIC_GRAPH_OFFSET_Y,
+        20,
         SIZE_MAX - SIZE_MIN
       );
       ctx.restore();
