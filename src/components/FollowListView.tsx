@@ -127,6 +127,15 @@ const AccountCell = (props: { id: string }) => {
   );
 
   const href = useMemo(() => `/?${stringify({ id })}`, [id]);
+  const iconUrl = useMemo(() => {
+    if (!twitterAccount) {
+      return [];
+    }
+    return [
+      twitterAccount.iconUrl.replace(/_normal(\.(png|jpe?g|gif))$/, "$1"),
+      twitterAccount.iconUrl
+    ];
+  }, [twitterAccount]);
 
   useEffect(() => {
     if (!id) {
@@ -143,10 +152,9 @@ const AccountCell = (props: { id: string }) => {
         <div
           css={cellIconStyle}
           style={{
-            backgroundImage:
-              twitterAccount && twitterAccount.iconUrl
-                ? `url(${twitterAccount.iconUrl})`
-                : "none"
+            backgroundImage: iconUrl.length
+              ? iconUrl.map(u => `url(${u})`).join(",")
+              : "none"
           }}
         />
         <div css={cellTextStyle}>
