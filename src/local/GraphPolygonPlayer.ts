@@ -1,5 +1,6 @@
 import { CanvasPlayer } from "~/lib/useCanvasAgent";
 import { minBy, maxBy, mix, padLeft, clamp } from "~/lib/lodashLike";
+import { px } from "~/lib/cssUtil";
 import { CUSTOM_FONT_FAMILY } from "~/local/commonCss";
 import { TwitterData } from "~/scheme/TwitterData";
 
@@ -12,9 +13,8 @@ const SCROLL_GRAPH_UNIT = 10;
 const SCROLL_GRAPH_OFFSET_Y = 120;
 const STATIC_GRAPH_OFFSET_Y = -120;
 
-const makeFont = (size: number) => {
-  return `${size}px/${size}px ${CUSTOM_FONT_FAMILY}`;
-};
+const makeFont = (size: number) =>
+  [[px(size), px(size)].join("/"), CUSTOM_FONT_FAMILY].join(" ");
 
 export default class GraphPolygonPlayer implements CanvasPlayer {
   public readonly canvas: HTMLCanvasElement;
@@ -81,54 +81,56 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
       const staticGraphLength = (vw / mc) * cc;
       const highlightWidth = (staticGraphLength * vw) / scrollLength;
 
-      const points1 = this.list.map(({ followersCount: count }, i) => {
-        const x = -i * SCROLL_GRAPH_UNIT + scrollOffset;
-        const y =
+      const ys = this.list.map(
+        ({ followersCount: count }) =>
           mix(
             GRAPH_HEIGHT,
             0,
             minCount === maxCount
               ? 0.5
               : (count - minCount) / (maxCount - minCount)
-          ) +
-          SCROLL_GRAPH_OFFSET_Y -
-          GRAPH_HEIGHT * 0.5;
+          ) -
+          GRAPH_HEIGHT * 0.5
+      );
+      const points1 = ys.map((y, i) => {
+        const x = -i * SCROLL_GRAPH_UNIT + scrollOffset;
         return { x, y };
       });
-      const points2 = this.list.map(({ followersCount: count }, i) => {
+      const points2 = ys.map((y, i) => {
         const x = staticGraphRight - (vw / mc) * i;
-        const y =
-          mix(
-            GRAPH_HEIGHT,
-            0,
-            minCount === maxCount
-              ? 0.5
-              : (count - minCount) / (maxCount - minCount)
-          ) +
-          STATIC_GRAPH_OFFSET_Y -
-          GRAPH_HEIGHT * 0.5;
         return { x, y };
       });
       const focusIndex = Math.round(scroll * (this.list.length - 1));
       const focusItem = this.list[focusIndex];
 
-      ctx.save();
-      ctx.fillStyle = "#008";
-      ctx.fillRect(
-        -vw / 2,
-        SCROLL_GRAPH_OFFSET_Y - GRAPH_HEIGHT * 0.5 - HIGHLIGHT_PADDING,
-        vw,
-        GRAPH_HEIGHT + HIGHLIGHT_PADDING * 2
-      );
-      ctx.fillRect(
-        staticGraphRight - staticGraphLength * scroll - highlightWidth / 2,
-        STATIC_GRAPH_OFFSET_Y - GRAPH_HEIGHT * 0.5 - HIGHLIGHT_PADDING,
-        highlightWidth,
-        GRAPH_HEIGHT + HIGHLIGHT_PADDING * 2
-      );
-      ctx.restore();
+      [
+        {
+          points: points1,
+          offsetY: SCROLL_GRAPH_OFFSET_Y,
+          rangeStart: -vw / 2,
+          rangeWidth: vw
+        },
+        {
+          points: points2,
+          offsetY: STATIC_GRAPH_OFFSET_Y,
+          rangeStart:
+            staticGraphRight - staticGraphLength * scroll - highlightWidth / 2,
+          rangeWidth: highlightWidth
+        }
+      ].forEach(({ points, offsetY, rangeStart, rangeWidth }) => {
+        ctx.save();
+        ctx.translate(0, offsetY);
 
-      [points1, points2].forEach(points => {
+        ctx.save();
+        ctx.fillStyle = "#008";
+        ctx.fillRect(
+          rangeStart,
+          -GRAPH_HEIGHT * 0.5 - HIGHLIGHT_PADDING,
+          rangeWidth,
+          GRAPH_HEIGHT + HIGHLIGHT_PADDING * 2
+        );
+        ctx.restore();
+
         if (points.length > 1) {
           ctx.beginPath();
           points.forEach(({ x, y }, i) => {
@@ -154,6 +156,7 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
             }
           });
         }
+        ctx.restore();
       });
 
       if (focusItem) {
