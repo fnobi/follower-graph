@@ -62,7 +62,7 @@ const DataLogView = (props: { twitterId: string; onBack?: () => void }) => {
   const { user } = useMeStore();
   const [list, setList] = useState<TwitterData[] | null>(null);
   const [filter, setFilter] = useState<"hours" | "days" | "monthes">("hours");
-  const [entryId, setEntryId] = useState("");
+  const [entryId, setEntryId] = useState<string[]>([]);
 
   const handleLogout = () => {
     signOut(firebaseAuth());
@@ -107,9 +107,9 @@ const DataLogView = (props: { twitterId: string; onBack?: () => void }) => {
         twitterName={twitterId}
         onEntry={setEntryId}
       />
-      {entryId ? (
+      {entryId.length ? (
         <div css={entryInfoStyle}>
-          <EntryView id={entryId} name={twitterId} />
+          <EntryView ids={entryId} name={twitterId} />
         </div>
       ) : null}
       <div css={headerStyle}>

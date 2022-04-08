@@ -29,7 +29,7 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
 
   private twitterName: string = "";
 
-  private entryListener: (id: string) => void = () => {};
+  private entryListener: (ids: string[]) => void = () => {};
 
   public constructor() {
     const canvas = document.createElement("canvas");
@@ -58,11 +58,10 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
   public checkEntry() {
     const focusIndex = Math.round(this.scroll * (this.list.length - 1));
     const focusItem = this.list[focusIndex];
-    const [latestEntry] = focusItem.recentTweets;
-    this.entryListener(latestEntry || "");
+    this.entryListener([...focusItem.recentTweets]);
   }
 
-  public setEntryListener(fn: (id: string) => void) {
+  public setEntryListener(fn: (ids: string[]) => void) {
     this.entryListener = fn;
     this.checkEntry();
   }

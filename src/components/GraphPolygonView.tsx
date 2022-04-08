@@ -24,7 +24,7 @@ const canvasStyle = css({
 const GraphPolygonView = (props: {
   list: TwitterData[];
   twitterName: string;
-  onEntry: (id: string) => void;
+  onEntry: (ids: string[]) => void;
 }) => {
   const { list, twitterName, onEntry } = props;
   const wrapperRef = useRef<HTMLDivElement | null>(null);
