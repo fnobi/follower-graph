@@ -17,6 +17,14 @@ const STATIC_GRAPH_OFFSET_Y = -120;
 const makeFont = (size: number) =>
   [[px(size), px(size)].join("/"), CUSTOM_FONT_FAMILY].join(" ");
 
+const calcYUnit = (diff: number) => {
+  let p = 3;
+  while (10 ** p < diff) {
+    p += 1;
+  }
+  return 10 ** (p - 1);
+};
+
 export default class GraphPolygonPlayer implements CanvasPlayer {
   public readonly canvas: HTMLCanvasElement;
 
@@ -87,6 +95,12 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
       const staticGraphRight = (0.5 - 1 / mc) * vw;
       const staticGraphLength = (vw / mc) * cc;
       const highlightWidth = (staticGraphLength * vw) / scrollLength;
+      const yUnit = calcYUnit(maxCount - minCount);
+      const yAxisStart = Math.ceil(minCount / yUnit) * yUnit;
+      const yLineCount = Math.ceil((maxCount - yAxisStart) / yUnit);
+      const yAxises = new Array(yLineCount)
+        .fill(0)
+        .map((z, i) => yAxisStart + i * yUnit);
 
       const ys = this.list.map(({ followersCount: count }) =>
         minCount === maxCount ? 0.5 : (count - minCount) / (maxCount - minCount)
@@ -128,6 +142,26 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
           rangeWidth,
           GRAPH_HEIGHT + HIGHLIGHT_PADDING * 2
         );
+        ctx.restore();
+
+        ctx.save();
+        ctx.globalAlpha = 0.3;
+        ctx.beginPath();
+        yAxises
+          .map(v =>
+            mix(
+              GRAPH_HEIGHT / 2,
+              -GRAPH_HEIGHT / 2,
+              minCount === maxCount
+                ? 0.5
+                : (v - minCount) / (maxCount - minCount)
+            )
+          )
+          .forEach(y => {
+            ctx.moveTo(-vw / 2, y);
+            ctx.lineTo(vw / 2, y);
+          });
+        ctx.stroke();
         ctx.restore();
 
         if (points.length > 1) {
