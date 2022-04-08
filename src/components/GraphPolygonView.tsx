@@ -1,10 +1,14 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { css } from "@emotion/react";
 import { percent } from "~/lib/cssUtil";
 import useCanvasAgent from "~/lib/useCanvasAgent";
 import Dragger from "~/lib/Dragger";
+import { clamp } from "~/lib/lodashLike";
 import GraphPolygonPlayer from "~/local/GraphPolygonPlayer";
 import { TwitterData } from "~/scheme/TwitterData";
+
+export const calcFocusIndex = (list: TwitterData[], scroll: number) =>
+  Math.round(scroll * (list.length - 1));
 
 const canvasStyle = css({
   position: "fixed",
@@ -27,11 +31,20 @@ const GraphPolygonView = (props: {
   onEntry: (ids: string[]) => void;
 }) => {
   const { list, twitterName, onEntry } = props;
+  const [scroll, setScroll] = useState(0);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const { playerRef } = useCanvasAgent({
     initializer: () => new GraphPolygonPlayer(),
     wrapperRef
   });
+
+  const handleScroll = (fn: (s: number) => number) => {
+    setScroll(s => clamp(0, 1, fn(s)));
+  };
+
+  const scrollBy = (delta: number) => {
+    handleScroll(s => s + delta);
+  };
 
   useEffect(() => {
     const { current: wrapper } = wrapperRef;
@@ -41,10 +54,7 @@ const GraphPolygonView = (props: {
     const dragger = new Dragger({
       els: [wrapper],
       onMove: ({ x, y }) => {
-        const { current: player } = playerRef;
-        if (player) {
-          player.scrollBy((-y + x) * 0.0002);
-        }
+        scrollBy((-y + x) * 0.0002);
       },
       wheelHandler: (e: WheelEvent) => ({
         x: 0,
@@ -64,11 +74,12 @@ const GraphPolygonView = (props: {
   }, [list]);
 
   useEffect(() => {
-    const { current: player } = playerRef;
-    if (player) {
-      player.setEntryListener(onEntry);
+    const focusIndex = calcFocusIndex(list, scroll);
+    const focusItem = list[focusIndex];
+    if (focusItem) {
+      onEntry(focusItem.recentTweets);
     }
-  }, [onEntry]);
+  }, [onEntry, scroll]);
 
   useEffect(() => {
     const { current: player } = playerRef;
@@ -76,6 +87,13 @@ const GraphPolygonView = (props: {
       player.setTwitterName(twitterName);
     }
   }, [twitterName]);
+
+  useEffect(() => {
+    const { current: player } = playerRef;
+    if (player) {
+      player.setScroll(scroll);
+    }
+  }, [scroll]);
 
   return <div css={canvasStyle} ref={wrapperRef} />;
 };

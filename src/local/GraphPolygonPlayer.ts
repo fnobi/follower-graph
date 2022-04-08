@@ -1,8 +1,9 @@
 import { CanvasPlayer } from "~/lib/useCanvasAgent";
-import { minBy, maxBy, mix, padLeft, clamp } from "~/lib/lodashLike";
+import { minBy, maxBy, mix, padLeft } from "~/lib/lodashLike";
 import { px } from "~/lib/cssUtil";
 import { CUSTOM_FONT_FAMILY } from "~/local/commonCss";
 import { TwitterData } from "~/scheme/TwitterData";
+import { calcFocusIndex } from "~/components/GraphPolygonView";
 
 const VIEWPORT = 450;
 const GRAPH_HEIGHT = 80;
@@ -29,8 +30,6 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
 
   private twitterName: string = "";
 
-  private entryListener: (ids: string[]) => void = () => {};
-
   public constructor() {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
@@ -47,23 +46,11 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
   }
 
   public setScroll(num: number) {
-    this.scroll = clamp(0, 1, num);
-    this.checkEntry();
+    this.scroll = num;
   }
 
   public scrollBy(delta: number) {
     this.setScroll(this.scroll + delta);
-  }
-
-  public checkEntry() {
-    const focusIndex = Math.round(this.scroll * (this.list.length - 1));
-    const focusItem = this.list[focusIndex];
-    this.entryListener([...focusItem.recentTweets]);
-  }
-
-  public setEntryListener(fn: (ids: string[]) => void) {
-    this.entryListener = fn;
-    this.checkEntry();
   }
 
   private render() {
@@ -106,7 +93,7 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
         x: staticGraphRight - (vw / mc) * i,
         y: mix(GRAPH_HEIGHT, 0, y) - GRAPH_HEIGHT * 0.5
       }));
-      const focusIndex = Math.round(scroll * (this.list.length - 1));
+      const focusIndex = calcFocusIndex(this.list, scroll);
       const focusItem = this.list[focusIndex];
 
       [
