@@ -14,10 +14,13 @@ const wrapperStyle = css({
   padding: em(0.5)
 });
 
-const EntryView: FC<{ id: string }> = ({ id }) => {
+const EntryView: FC<{ name: string; id: string }> = ({ name, id }) => {
   const [entry, setEntry] = useState<TwitterEntry | null>(null);
 
-  const href = useMemo(() => `https://twitter.com/fnobi/status/${id}`, [id]);
+  const href = useMemo(() => `https://twitter.com/${name}/status/${id}`, [
+    name,
+    id
+  ]);
 
   useEffect(() => {
     setEntry(null);
