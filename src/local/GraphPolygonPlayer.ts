@@ -59,9 +59,7 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
     const focusIndex = Math.round(this.scroll * (this.list.length - 1));
     const focusItem = this.list[focusIndex];
     const [latestEntry] = focusItem.recentTweets;
-    if (latestEntry) {
-      this.entryListener(latestEntry);
-    }
+    this.entryListener(latestEntry || "");
   }
 
   public setEntryListener(fn: (id: string) => void) {

@@ -21,6 +21,7 @@ import { buttonLinkStyle, buttonReset } from "~/local/commonCss";
 import { firebaseAuth } from "~/local/firebaseApp";
 import { useMeStore } from "~/local/useMeStore";
 import { parseTwitterData, TwitterData } from "~/scheme/TwitterData";
+import EntryView from "~/components/EntryView";
 import LoadingView from "~/components/LoadingView";
 
 const GraphPolygonView = dynamic(
@@ -42,8 +43,9 @@ const footerStyle = css({
 
 const entryInfoStyle = css({
   position: "absolute",
-  right: em(0),
-  top: em(0)
+  right: em(0.5),
+  left: em(0.5),
+  bottom: em(4)
 });
 
 const filterSelectStyle = css(buttonReset, {
@@ -107,7 +109,7 @@ const DataLogView = (props: { twitterId: string; onBack?: () => void }) => {
       />
       {entryId ? (
         <div key={entryId} css={entryInfoStyle}>
-          {entryId}
+          <EntryView id={entryId} />
         </div>
       ) : null}
       <div css={headerStyle}>
