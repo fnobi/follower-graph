@@ -31,10 +31,13 @@ const arrowStyle = css(buttonReset, {
   }
 });
 
-const EntryView: FC<{ name: string; ids: string[] }> = ({ name, ids }) => {
+const EntryView: FC<{
+  name: string;
+  tweetEntries: { id: string; index: number }[];
+}> = ({ name, tweetEntries }) => {
   const [index, setIndex] = useState(0);
   const [entry, setEntry] = useState<TwitterEntry | null>(null);
-  const id = useMemo(() => ids[index], [ids, index]);
+  const id = useMemo(() => tweetEntries[index].id, [tweetEntries, index]);
 
   const href = useMemo(() => `https://twitter.com/${name}/status/${id}`, [
     name,
@@ -54,7 +57,7 @@ const EntryView: FC<{ name: string; ids: string[] }> = ({ name, ids }) => {
 
   useEffect(() => {
     setIndex(0);
-  }, [ids]);
+  }, [tweetEntries]);
 
   useEffect(() => {
     const ref = twitterEntryDocumentRef(id);
@@ -76,7 +79,7 @@ const EntryView: FC<{ name: string; ids: string[] }> = ({ name, ids }) => {
               type="button"
               css={arrowStyle}
               onClick={() => setIndex(i => i + 1)}
-              disabled={index + 1 >= ids.length}
+              disabled={index + 1 >= tweetEntries.length}
             >
               ＜
             </button>

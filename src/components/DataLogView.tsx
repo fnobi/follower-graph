@@ -1,6 +1,6 @@
 import { css } from "@emotion/react";
 import dynamic from "next/dynamic";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { em, px } from "~/lib/cssUtil";
 import { signOut } from "firebase/auth";
 import {
@@ -13,7 +13,7 @@ import {
   where
 } from "firebase/firestore";
 import { useRouter } from "next/router";
-import { clamp } from "~/lib/lodashLike";
+import { clamp, flatten, sortBy, uniq } from "~/lib/lodashLike";
 import {
   profileFollowDocumentRef,
   twitterLogCollectionRef
@@ -65,7 +65,30 @@ const DataLogView = (props: { twitterId: string; onBack?: () => void }) => {
   const [list, setList] = useState<TwitterData[] | null>(null);
   const [filter, setFilter] = useState<"hours" | "days" | "monthes">("hours");
   const [scroll, setScroll] = useState(0);
-  const [entryId, setEntryId] = useState<string[]>([]);
+
+  const tweetEntries = useMemo(() => {
+    if (!list) {
+      return [];
+    }
+    const reverseList = [...list].reverse();
+    const tweetIdList = uniq(
+      flatten(reverseList.map(item => item.recentTweets))
+    );
+    return sortBy(
+      tweetIdList.map(id => {
+        return {
+          id,
+          index:
+            list.length -
+            1 -
+            reverseList.findIndex(({ recentTweets }) =>
+              recentTweets.includes(id)
+            )
+        };
+      }),
+      item => -Number(item.id)
+    );
+  }, [list]);
 
   const handleScroll = (fn: (s: number) => number) => {
     setScroll(s => clamp(0, 1, fn(s)));
@@ -108,10 +131,7 @@ const DataLogView = (props: { twitterId: string; onBack?: () => void }) => {
       return;
     }
     const focusIndex = calcFocusIndex(list, scroll);
-    const focusItem = list[focusIndex];
-    if (focusItem) {
-      setEntryId(focusItem.recentTweets);
-    }
+    console.log("focusIndex:", focusIndex);
   }, [scroll]);
 
   if (!list) {
@@ -126,9 +146,9 @@ const DataLogView = (props: { twitterId: string; onBack?: () => void }) => {
         scroll={scroll}
         onScroll={handleScroll}
       />
-      {entryId.length ? (
+      {tweetEntries.length ? (
         <div css={entryInfoStyle}>
-          <EntryView ids={entryId} name={twitterId} />
+          <EntryView tweetEntries={tweetEntries} name={twitterId} />
         </div>
       ) : null}
       <div css={headerStyle}>
