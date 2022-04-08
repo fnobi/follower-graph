@@ -108,7 +108,7 @@ const DataLogView = (props: { twitterId: string; onBack?: () => void }) => {
         onEntry={setEntryId}
       />
       {entryId ? (
-        <div key={entryId} css={entryInfoStyle}>
+        <div css={entryInfoStyle}>
           <EntryView id={entryId} name={twitterId} />
         </div>
       ) : null}

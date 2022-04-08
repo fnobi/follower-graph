@@ -1,7 +1,8 @@
 import { css } from "@emotion/react";
 import { onSnapshot } from "firebase/firestore";
 import { FC, useEffect, useMemo, useState } from "react";
-import { em, px } from "~/lib/cssUtil";
+import { em, percent, px } from "~/lib/cssUtil";
+import { padLeft } from "~/lib/lodashLike";
 import { twitterEntryDocumentRef } from "~/local/database";
 import { parseTwitterEntry, TwitterEntry } from "~/scheme/TwitterEntry";
 
@@ -14,6 +15,13 @@ const wrapperStyle = css({
   padding: em(0.5)
 });
 
+const mainTextStyle = css({});
+
+const dateStyle = css({
+  fontSize: percent(50),
+  textAlign: "right"
+});
+
 const EntryView: FC<{ name: string; id: string }> = ({ name, id }) => {
   const [entry, setEntry] = useState<TwitterEntry | null>(null);
 
@@ -22,8 +30,18 @@ const EntryView: FC<{ name: string; id: string }> = ({ name, id }) => {
     id
   ]);
 
+  const date = useMemo(() => {
+    if (!entry) {
+      return "";
+    }
+    const d = new Date(entry.createdAt);
+    return [
+      [d.getMonth() + 1, d.getDate()].join("/"),
+      [d.getHours(), d.getMinutes()].map(n => padLeft(n, 2)).join(":")
+    ].join(" ");
+  }, [entry]);
+
   useEffect(() => {
-    setEntry(null);
     const ref = twitterEntryDocumentRef(id);
     return onSnapshot(ref, snapshot => {
       setEntry(parseTwitterEntry(snapshot.data()));
@@ -31,7 +49,14 @@ const EntryView: FC<{ name: string; id: string }> = ({ name, id }) => {
   }, [id]);
   return (
     <a href={href} target="_blank" rel="noopener noreferrer" css={wrapperStyle}>
-      {entry ? entry.text : "loading..."}
+      {entry ? (
+        <>
+          <div css={mainTextStyle}>{entry.text}</div>
+          <div css={dateStyle}>{date}</div>
+        </>
+      ) : (
+        "loading..."
+      )}
     </a>
   );
 };
