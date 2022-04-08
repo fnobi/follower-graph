@@ -11,6 +11,12 @@ const COLLECTION_PATH_TWITTERS_LOG = (userId: string) => [
   "log"
 ];
 
+const COLLECTION_PATH_ENTRIES = () => ["entries"];
+export const DOCUMNENT_PATH_ENTRIES = (id: string) => [
+  ...COLLECTION_PATH_ENTRIES(),
+  id
+];
+
 const COLLECTION_PATH_PROFILES = () => ["profiles"];
 const DOCUMNENT_PATH_PROFILES = (userId: string) => [
   ...COLLECTION_PATH_PROFILES(),
@@ -31,6 +37,8 @@ export const twitterDocumentRef = (id: string) =>
   doc(firebaseFirestore(), DOCUMNENT_PATH_TWITTERS(id).join("/"));
 export const twitterLogCollectionRef = (id: string) =>
   collection(firebaseFirestore(), COLLECTION_PATH_TWITTERS_LOG(id).join("/"));
+export const twitterEntryDocumentRef = (id: string) =>
+  doc(firebaseFirestore(), DOCUMNENT_PATH_ENTRIES(id).join("/"));
 
 export const profileCollectionRef = () =>
   collection(firebaseFirestore(), COLLECTION_PATH_PROFILES().join("/"));

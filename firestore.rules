@@ -22,5 +22,8 @@ service cloud.firestore {
         allow read, write: if request.auth.uid == userId;
       }
     }
+    match /entries/{entryId} {
+      allow read: if true;
+    }
   }
 }
