@@ -90,6 +90,13 @@ const DataLogView = (props: { twitterId: string; onBack?: () => void }) => {
     );
   }, [list]);
 
+  const focusIndex = useMemo(() => {
+    if (!list) {
+      return 0;
+    }
+    return calcFocusIndex(list, scroll);
+  }, [scroll]);
+
   const handleScroll = (fn: (s: number) => number) => {
     setScroll(s => clamp(0, 1, fn(s)));
   };
@@ -126,14 +133,6 @@ const DataLogView = (props: { twitterId: string; onBack?: () => void }) => {
     );
   }, [twitterId, filter]);
 
-  useEffect(() => {
-    if (!list) {
-      return;
-    }
-    const focusIndex = calcFocusIndex(list, scroll);
-    console.log("focusIndex:", focusIndex);
-  }, [scroll]);
-
   if (!list) {
     return <LoadingView />;
   }
@@ -143,12 +142,17 @@ const DataLogView = (props: { twitterId: string; onBack?: () => void }) => {
       <GraphPolygonView
         list={list}
         twitterName={twitterId}
+        entryIndexes={tweetEntries.map(t => t.index)}
         scroll={scroll}
         onScroll={handleScroll}
       />
       {tweetEntries.length ? (
         <div css={entryInfoStyle}>
-          <EntryView tweetEntries={tweetEntries} name={twitterId} />
+          <EntryView
+            focusIndex={focusIndex}
+            tweetEntries={tweetEntries}
+            name={twitterId}
+          />
         </div>
       ) : null}
       <div css={headerStyle}>

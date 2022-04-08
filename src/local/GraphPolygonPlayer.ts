@@ -28,6 +28,8 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
 
   private list: TwitterData[] = [];
 
+  private entryIndexes: number[] = [];
+
   private twitterName: string = "";
 
   public constructor() {
@@ -43,6 +45,10 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
 
   public setTwitterName(twitterName: string) {
     this.twitterName = twitterName;
+  }
+
+  public setEntryIndexes(is: number[]) {
+    this.entryIndexes = [...is];
   }
 
   public setScroll(num: number) {
@@ -136,13 +142,20 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
           ctx.stroke();
 
           points.forEach(({ x, y }, i) => {
-            if (i === focusIndex || i === 0 || i === this.list.length - 1) {
+            const isEdge = i === 0 || i === this.list.length - 1;
+            const isFocus = i === focusIndex;
+            const isEntrySpot = this.entryIndexes.includes(i);
+            if (isFocus || isEdge || isEntrySpot) {
               ctx.save();
-              ctx.fillStyle = i === focusIndex ? "#fff" : "#003";
+              ctx.fillStyle = isFocus ? "#fff" : "#003";
+              if (isEntrySpot) {
+                ctx.fillStyle = "#0f0";
+              }
+              const dotSize = isFocus || !isEntrySpot ? DOT_SIZE : DOT_SIZE / 2;
               ctx.beginPath();
-              ctx.arc(x, y, DOT_SIZE, 0, Math.PI * 2);
+              ctx.arc(x, y, dotSize, 0, Math.PI * 2);
               ctx.fill();
-              if (i !== focusIndex) {
+              if (isEdge) {
                 ctx.stroke();
               }
               ctx.restore();

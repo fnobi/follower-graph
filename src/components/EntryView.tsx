@@ -3,18 +3,22 @@ import { onSnapshot } from "firebase/firestore";
 import { FC, useEffect, useMemo, useState } from "react";
 import { em, percent, px } from "~/lib/cssUtil";
 import { padLeft } from "~/lib/lodashLike";
-import { buttonReset } from "~/local/commonCss";
 import { twitterEntryDocumentRef } from "~/local/database";
 import { parseTwitterEntry, TwitterEntry } from "~/scheme/TwitterEntry";
 
 const wrapperStyle = css({
+  "--focusColor": "#fff",
   display: "block",
   backgroundColor: "#333",
-  border: `solid ${px(1)} #fff`,
+  color: "var(--focusColor)",
+  border: `solid ${px(1)} var(--focusColor)`,
   padding: em(0.5),
   a: {
     color: "inherit",
     textDecoration: "none"
+  },
+  "&[data-focus='true']": {
+    "--focusColor": "#0f0"
   }
 });
 
@@ -25,24 +29,23 @@ const dateStyle = css({
   textAlign: "right"
 });
 
-const arrowStyle = css(buttonReset, {
-  "&:disabled": {
-    opacity: 0.5
-  }
-});
-
 const EntryView: FC<{
   name: string;
+  focusIndex: number;
   tweetEntries: { id: string; index: number }[];
-}> = ({ name, tweetEntries }) => {
-  const [index, setIndex] = useState(0);
+}> = ({ name, focusIndex, tweetEntries }) => {
   const [entry, setEntry] = useState<TwitterEntry | null>(null);
-  const id = useMemo(() => tweetEntries[index].id, [tweetEntries, index]);
+  const focusItem = useMemo(() => {
+    const filtered = tweetEntries.filter(item => item.index >= focusIndex);
+    const [n] = filtered;
+    return n;
+  }, [tweetEntries, focusIndex]);
+  const id = useMemo(() => (focusItem ? focusItem.id : null), [focusItem]);
 
-  const href = useMemo(() => `https://twitter.com/${name}/status/${id}`, [
-    name,
-    id
-  ]);
+  const href = useMemo(
+    () => (id ? `https://twitter.com/${name}/status/${id}` : null),
+    [name, id]
+  );
 
   const date = useMemo(() => {
     if (!entry) {
@@ -56,47 +59,35 @@ const EntryView: FC<{
   }, [entry]);
 
   useEffect(() => {
-    setIndex(0);
-  }, [tweetEntries]);
-
-  useEffect(() => {
+    if (!id) {
+      setEntry(null);
+      return () => {};
+    }
     const ref = twitterEntryDocumentRef(id);
     return onSnapshot(ref, snapshot => {
       setEntry(parseTwitterEntry(snapshot.data()));
     });
   }, [id]);
 
+  if (!entry) {
+    return null;
+  }
+
   return (
-    <div css={wrapperStyle}>
-      {entry ? (
-        <>
-          <div css={mainTextStyle}>{entry.text}</div>
+    <div
+      css={wrapperStyle}
+      data-focus={
+        focusItem && focusItem.index === focusIndex ? "true" : "false"
+      }
+    >
+      <>
+        <div css={mainTextStyle}>{entry.text}</div>
+        {href ? (
           <a href={href} target="_blank" rel="noopener noreferrer">
             <div css={dateStyle}>{date}</div>
           </a>
-          <div>
-            <button
-              type="button"
-              css={arrowStyle}
-              onClick={() => setIndex(i => i + 1)}
-              disabled={index + 1 >= tweetEntries.length}
-            >
-              ＜
-            </button>
-            &nbsp;
-            <button
-              type="button"
-              css={arrowStyle}
-              onClick={() => setIndex(i => i - 1)}
-              disabled={index - 1 < 0}
-            >
-              ＞
-            </button>
-          </div>
-        </>
-      ) : (
-        "loading..."
-      )}
+        ) : null}
+      </>
     </div>
   );
 };
