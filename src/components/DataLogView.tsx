@@ -13,6 +13,7 @@ import {
   where
 } from "firebase/firestore";
 import { useRouter } from "next/router";
+import { clamp } from "~/lib/lodashLike";
 import {
   profileFollowDocumentRef,
   twitterLogCollectionRef
@@ -23,6 +24,7 @@ import { useMeStore } from "~/local/useMeStore";
 import { parseTwitterData, TwitterData } from "~/scheme/TwitterData";
 import EntryView from "~/components/EntryView";
 import LoadingView from "~/components/LoadingView";
+import { calcFocusIndex } from "~/components/GraphPolygonView";
 
 const GraphPolygonView = dynamic(
   () => import("~/components/GraphPolygonView"),
@@ -62,7 +64,12 @@ const DataLogView = (props: { twitterId: string; onBack?: () => void }) => {
   const { user } = useMeStore();
   const [list, setList] = useState<TwitterData[] | null>(null);
   const [filter, setFilter] = useState<"hours" | "days" | "monthes">("hours");
+  const [scroll, setScroll] = useState(0);
   const [entryId, setEntryId] = useState<string[]>([]);
+
+  const handleScroll = (fn: (s: number) => number) => {
+    setScroll(s => clamp(0, 1, fn(s)));
+  };
 
   const handleLogout = () => {
     signOut(firebaseAuth());
@@ -96,6 +103,17 @@ const DataLogView = (props: { twitterId: string; onBack?: () => void }) => {
     );
   }, [twitterId, filter]);
 
+  useEffect(() => {
+    if (!list) {
+      return;
+    }
+    const focusIndex = calcFocusIndex(list, scroll);
+    const focusItem = list[focusIndex];
+    if (focusItem) {
+      setEntryId(focusItem.recentTweets);
+    }
+  }, [scroll]);
+
   if (!list) {
     return <LoadingView />;
   }
@@ -105,7 +123,8 @@ const DataLogView = (props: { twitterId: string; onBack?: () => void }) => {
       <GraphPolygonView
         list={list}
         twitterName={twitterId}
-        onEntry={setEntryId}
+        scroll={scroll}
+        onScroll={handleScroll}
       />
       {entryId.length ? (
         <div css={entryInfoStyle}>

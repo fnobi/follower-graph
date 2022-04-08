@@ -1,9 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { css } from "@emotion/react";
 import { percent } from "~/lib/cssUtil";
 import useCanvasAgent from "~/lib/useCanvasAgent";
 import Dragger from "~/lib/Dragger";
-import { clamp } from "~/lib/lodashLike";
 import GraphPolygonPlayer from "~/local/GraphPolygonPlayer";
 import { TwitterData } from "~/scheme/TwitterData";
 
@@ -28,22 +27,18 @@ const canvasStyle = css({
 const GraphPolygonView = (props: {
   list: TwitterData[];
   twitterName: string;
-  onEntry: (ids: string[]) => void;
+  scroll: number;
+  onScroll: (fn: (s: number) => number) => void;
 }) => {
-  const { list, twitterName, onEntry } = props;
-  const [scroll, setScroll] = useState(0);
+  const { list, twitterName, scroll, onScroll } = props;
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const { playerRef } = useCanvasAgent({
     initializer: () => new GraphPolygonPlayer(),
     wrapperRef
   });
 
-  const handleScroll = (fn: (s: number) => number) => {
-    setScroll(s => clamp(0, 1, fn(s)));
-  };
-
   const scrollBy = (delta: number) => {
-    handleScroll(s => s + delta);
+    onScroll(s => s + delta);
   };
 
   useEffect(() => {
@@ -72,14 +67,6 @@ const GraphPolygonView = (props: {
       player.setList(list);
     }
   }, [list]);
-
-  useEffect(() => {
-    const focusIndex = calcFocusIndex(list, scroll);
-    const focusItem = list[focusIndex];
-    if (focusItem) {
-      onEntry(focusItem.recentTweets);
-    }
-  }, [onEntry, scroll]);
 
   useEffect(() => {
     const { current: player } = playerRef;
