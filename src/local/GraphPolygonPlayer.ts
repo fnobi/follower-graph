@@ -136,6 +136,21 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
       ctx.restore();
 
       if (scaledPoints.length > 1) {
+        scaledPoints.forEach(({ x, y }, i) => {
+          const isFocus = i === focusIndex;
+          if (isFocus) {
+            ctx.save();
+            ctx.fillStyle = "#fff";
+            ctx.strokeStyle = "#00f";
+            ctx.beginPath();
+            ctx.arc(x, y, DOT_SIZE * 0.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.moveTo(x, -vh / 2 - GRAPH_OFFSET_Y);
+            ctx.lineTo(x, vh / 2 - GRAPH_OFFSET_Y);
+            ctx.stroke();
+            ctx.restore();
+          }
+        });
         ctx.beginPath();
         scaledPoints.forEach(({ x, y }, i) => {
           if (i) {
@@ -148,18 +163,19 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
 
         scaledPoints.forEach(({ x, y }, i) => {
           const isEdge = i === 0 || i === this.list.length - 1;
-          const isFocus = i === focusIndex;
           const isEntrySpot = this.entryIndexes.includes(i);
-          if (isFocus) {
+          if (isEntrySpot) {
+            const markWidth = 8;
+            const markHeight = 6;
+            const yOffset = -8;
             ctx.save();
-            ctx.fillStyle = "#fff";
+            ctx.fillStyle = "#0ff";
             ctx.beginPath();
-            ctx.arc(x, y, DOT_SIZE * 0.5, 0, Math.PI * 2);
+            ctx.moveTo(x, y + yOffset);
+            ctx.lineTo(x - markWidth / 2, y - markHeight + yOffset);
+            ctx.lineTo(x + markWidth / 2, y - markHeight + yOffset);
+            ctx.lineTo(x, y + yOffset);
             ctx.fill();
-            ctx.globalAlpha = 0.5;
-            ctx.moveTo(x, -vh / 2 - GRAPH_OFFSET_Y);
-            ctx.lineTo(x, vh / 2 - GRAPH_OFFSET_Y);
-            ctx.stroke();
             ctx.restore();
           }
           if (isEdge) {
@@ -169,20 +185,6 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
             ctx.arc(x, y, DOT_SIZE, 0, Math.PI * 2);
             ctx.fill();
             ctx.stroke();
-            ctx.restore();
-          }
-          if (isEntrySpot) {
-            const markWidth = 8;
-            const markHeight = 6;
-            const yOffset = -8;
-            ctx.save();
-            ctx.fillStyle = "#fff";
-            ctx.beginPath();
-            ctx.moveTo(x, y + yOffset);
-            ctx.lineTo(x - markWidth / 2, y - markHeight + yOffset);
-            ctx.lineTo(x + markWidth / 2, y - markHeight + yOffset);
-            ctx.lineTo(x, y + yOffset);
-            ctx.fill();
             ctx.restore();
           }
         });
