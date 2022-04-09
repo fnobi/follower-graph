@@ -7,7 +7,7 @@ import { twitterEntryDocumentRef } from "~/local/database";
 import { parseTwitterEntry, TwitterEntry } from "~/scheme/TwitterEntry";
 
 const wrapperStyle = css({
-  "--focusColor": "#fff",
+  "--focusColor": "#0f0",
   display: "block",
   backgroundColor: "#333",
   color: "var(--focusColor)",
@@ -16,9 +16,6 @@ const wrapperStyle = css({
   a: {
     color: "inherit",
     textDecoration: "none"
-  },
-  "&[data-focus='true']": {
-    "--focusColor": "#0f0"
   }
 });
 
@@ -35,11 +32,10 @@ const EntryView: FC<{
   tweetEntries: { id: string; index: number }[];
 }> = ({ name, focusIndex, tweetEntries }) => {
   const [entry, setEntry] = useState<TwitterEntry | null>(null);
-  const focusItem = useMemo(() => {
-    const filtered = tweetEntries.filter(item => item.index >= focusIndex);
-    const [n] = filtered;
-    return n;
-  }, [tweetEntries, focusIndex]);
+  const focusItem = useMemo(
+    () => tweetEntries.find(item => item.index === focusIndex),
+    [tweetEntries, focusIndex]
+  );
   const id = useMemo(() => (focusItem ? focusItem.id : null), [focusItem]);
 
   const href = useMemo(
@@ -74,12 +70,7 @@ const EntryView: FC<{
   }
 
   return (
-    <div
-      css={wrapperStyle}
-      data-focus={
-        focusItem && focusItem.index === focusIndex ? "true" : "false"
-      }
-    >
+    <div css={wrapperStyle}>
       <>
         <div css={mainTextStyle}>{entry.text}</div>
         {href ? (
