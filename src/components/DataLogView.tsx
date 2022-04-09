@@ -1,7 +1,7 @@
 import { css } from "@emotion/react";
 import dynamic from "next/dynamic";
 import { useState, useEffect, useMemo } from "react";
-import { em, px } from "~/lib/cssUtil";
+import { em, percent, px } from "~/lib/cssUtil";
 import { signOut } from "firebase/auth";
 import {
   deleteDoc,
@@ -13,7 +13,7 @@ import {
   where
 } from "firebase/firestore";
 import { useRouter } from "next/router";
-import { clamp, flatten, sortBy, uniq } from "~/lib/lodashLike";
+import { clamp, flatten, padLeft, sortBy, uniq } from "~/lib/lodashLike";
 import {
   profileFollowDocumentRef,
   twitterDocumentRef,
@@ -54,9 +54,7 @@ const profileViewStyle = css({
 
 const entryInfoStyle = css({
   position: "absolute",
-  right: em(0.5),
-  left: em(0.5),
-  bottom: em(4)
+  top: percent(50)
 });
 
 const filterSelectStyle = css(buttonReset, {
@@ -106,6 +104,24 @@ const DataLogView = (props: { twitterId: string; onBack?: () => void }) => {
     }
     return calcFocusIndex(list, scroll);
   }, [scroll]);
+
+  const focusItem = useMemo(() => (list ? list[focusIndex] || null : null), [
+    list,
+    focusIndex
+  ]);
+
+  const dateString = useMemo(() => {
+    if (!focusItem) {
+      return null;
+    }
+    const d = new Date(focusItem.createdAt);
+    return [
+      [d.getFullYear(), d.getMonth() + 1, d.getDate()]
+        .map(n => padLeft(n, 2))
+        .join("/"),
+      [d.getHours(), d.getMinutes()].map(n => padLeft(n, 2)).join(":")
+    ].join(" ");
+  }, [focusItem]);
 
   const handleScroll = (fn: (s: number) => number) => {
     setScroll(s => clamp(0, 1, fn(s)));
@@ -169,15 +185,22 @@ const DataLogView = (props: { twitterId: string; onBack?: () => void }) => {
           <ProfileView name={twitterId} account={account} />
         </div>
       ) : null}
-      {tweetEntries.length ? (
-        <div css={entryInfoStyle}>
+      <div css={entryInfoStyle}>
+        {focusItem ? (
+          <div>
+            {focusItem.followersCount.toLocaleString()}
+            <br />
+            {dateString}
+          </div>
+        ) : null}
+        {tweetEntries.length ? (
           <EntryView
             focusIndex={focusIndex}
             tweetEntries={tweetEntries}
             name={twitterId}
           />
-        </div>
-      ) : null}
+        ) : null}
+      </div>
       <div css={headerStyle}>
         <button type="button" css={buttonLinkStyle} onClick={onBack}>
           &lt;back

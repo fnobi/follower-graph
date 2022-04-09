@@ -1,22 +1,16 @@
 import { CanvasPlayer } from "~/lib/useCanvasAgent";
-import { minBy, maxBy, mix, padLeft } from "~/lib/lodashLike";
-import { px } from "~/lib/cssUtil";
-import { CUSTOM_FONT_FAMILY } from "~/local/commonCss";
+import { minBy, maxBy, mix } from "~/lib/lodashLike";
 import { TwitterData } from "~/scheme/TwitterData";
 import { calcFocusIndex } from "~/components/GraphPolygonView";
 
 const VIEWPORT = 450;
 const DOT_SIZE = 4;
-const FONT_SIZE = 45;
 const HIGHLIGHT_PADDING = 10;
 const SCROLL_GRAPH_HEIGHT = 160;
 const SCROLL_GRAPH_UNIT = 10;
 const SCROLL_GRAPH_OFFSET_Y = -100;
 const STATIC_GRAPH_HEIGHT = 10;
 const STATIC_GRAPH_OFFSET_Y = -220;
-
-const makeFont = (size: number) =>
-  [[px(size), px(size)].join("/"), CUSTOM_FONT_FAMILY].join(" ");
 
 const calcYUnit = (diff: number) => {
   let p = 3;
@@ -109,7 +103,6 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
         y
       }));
       const focusIndex = calcFocusIndex(this.list, scroll);
-      const focusItem = this.list[focusIndex];
 
       [
         {
@@ -200,28 +193,6 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
         }
         ctx.restore();
       });
-
-      if (focusItem) {
-        const d = new Date(focusItem.createdAt);
-        const dateString = [
-          [d.getFullYear(), d.getMonth() + 1, d.getDate()]
-            .map(n => padLeft(n, 2))
-            .join("/"),
-          [d.getHours(), d.getMinutes()].map(n => padLeft(n, 2)).join(":")
-        ].join(" ");
-
-        ctx.save();
-        ctx.fillStyle = "#fff";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-
-        ctx.font = makeFont(FONT_SIZE);
-        ctx.fillText(focusItem.followersCount.toLocaleString(), 0, 50);
-
-        ctx.font = makeFont(FONT_SIZE * 0.5);
-        ctx.fillText(dateString, 0, 100);
-        ctx.restore();
-      }
     }
     ctx.restore();
   }
