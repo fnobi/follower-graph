@@ -331,7 +331,6 @@ const DataLogScene: FC<{ twitterId: string; onBack?: () => void }> = ({
             >
               unfollow
             </button>
-            &nbsp;
           </div>
         ) : null}
       </div>

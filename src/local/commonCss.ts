@@ -12,7 +12,7 @@ export const globalStyle = css({
   body: {
     backgroundColor: THEME_BG,
     color: "#fff",
-    fontFamily: "sans-serif",
+    fontFamily: "'Noto Sans JP', sans-serif",
     lineHeight: 1.5,
     textSizeAdjust: "100%",
     [MQ_DESKTOP]: {

@@ -58,7 +58,7 @@ const MetaSettings = (props: PageMetaExtend) => {
         crossOrigin="crossOrigin"
       />
       <link
-        href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@400&display=swap"
         rel="stylesheet"
       />
     </Head>
