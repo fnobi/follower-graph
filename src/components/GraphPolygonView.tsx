@@ -83,7 +83,7 @@ const GraphPolygonView: FC<{
           scrollBy(x * 0.02);
         }
         if (lockDir !== "x") {
-          setGraphZoom(z => z + y * 0.01);
+          setGraphZoom(z => z + y * 0.001);
         }
         window.clearTimeout(lockTimer);
         lockTimer = window.setTimeout(() => {

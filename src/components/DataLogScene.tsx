@@ -148,7 +148,7 @@ const DataLogScene: FC<{ twitterId: string; onBack?: () => void }> = ({
   const [account, setAccount] = useState<TwitterAccount | null>(null);
   const [filter, setFilter] = useState<"hours" | "days" | "monthes">("hours");
   const [scroll, setScroll] = useState(0);
-  const [graphZoom, setGraphZoom] = useState(0);
+  const [graphZoom, setGraphZoom] = useState(0.5);
 
   const tweetEntries = useMemo(() => {
     if (!list) {
@@ -222,7 +222,7 @@ const DataLogScene: FC<{ twitterId: string; onBack?: () => void }> = ({
     setScroll(s => clamp(0, list ? list.length : 0, fn(s)));
   };
   const handleGraphZoom = (fn: (z: number) => number) => {
-    setGraphZoom(s => clamp(-9, 13, fn(s)));
+    setGraphZoom(z => clamp(0, 1, fn(z)));
   };
 
   const unfollowAccount = async () => {
@@ -264,7 +264,6 @@ const DataLogScene: FC<{ twitterId: string; onBack?: () => void }> = ({
 
   useEffect(() => {
     setScroll(0);
-    setGraphZoom(0);
   }, [list]);
 
   if (!list) {

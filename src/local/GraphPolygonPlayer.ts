@@ -89,7 +89,7 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
       const vw = canvas.width / this.scale;
       const vh = canvas.height / this.scale;
       const graphHeight = vh - GRAPH_PADDING * 2;
-      const graphUnit = Math.max(0, graphHeight / 30 + this.graphZoom);
+      const graphUnit = vw / mix(100, 5, this.graphZoom);
 
       const scrollLength = (this.list.length - 1) * graphUnit;
       const scrollOffset = scrollLength * scroll;
