@@ -5,6 +5,7 @@ import useCanvasAgent from "~/lib/useCanvasAgent";
 import Dragger from "~/lib/Dragger";
 import { MQ_DESKTOP, MQ_MOBILE } from "~/lib/MQ";
 import GraphPolygonPlayer from "~/local/GraphPolygonPlayer";
+import { THEME_GRAPH_BG } from "~/local/commonCss";
 import { TwitterData } from "~/scheme/TwitterData";
 
 export const calcFocusIndex = (list: TwitterData[], scroll: number) =>
@@ -14,7 +15,7 @@ const canvasStyle = css({
   position: "fixed",
   left: percent(0),
   width: percent(100),
-  backgroundColor: "#000",
+  backgroundColor: THEME_GRAPH_BG,
   canvas: {
     position: "absolute",
     top: percent(0),

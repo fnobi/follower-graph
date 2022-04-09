@@ -1,6 +1,6 @@
 import { CanvasPlayer } from "~/lib/useCanvasAgent";
 import { minBy, maxBy, mix } from "~/lib/lodashLike";
-import { THEME_BG, THEME_HIGHLIGHT } from "~/local/commonCss";
+import { THEME_GRAPH_BG, THEME_HIGHLIGHT } from "~/local/commonCss";
 import { TwitterData } from "~/scheme/TwitterData";
 import { calcFocusIndex } from "~/components/GraphPolygonView";
 
@@ -149,21 +149,20 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
           const isFocus = i === focusIndex;
           const isEdge = i === 0 || i === this.list.length - 1;
           const isEntrySpot = this.entryIndexes.includes(i);
-          if (isEntrySpot) {
-            ctx.save();
-            ctx.fillStyle = THEME_BG;
-            ctx.beginPath();
-            ctx.arc(x, y, DOT_SIZE, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.stroke();
-            ctx.restore();
-          }
           if (isFocus) {
             ctx.save();
             ctx.fillStyle = "#fff";
             ctx.beginPath();
             ctx.arc(x, y, DOT_SIZE - 2, 0, Math.PI * 2);
             ctx.fill();
+            ctx.restore();
+          } else if (isEntrySpot) {
+            ctx.save();
+            ctx.fillStyle = THEME_GRAPH_BG;
+            ctx.beginPath();
+            ctx.arc(x, y, DOT_SIZE, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
             ctx.restore();
           } else if (isEdge) {
             ctx.save();
