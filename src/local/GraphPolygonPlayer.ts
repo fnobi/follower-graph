@@ -149,14 +149,7 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
           const isFocus = i === focusIndex;
           const isEdge = i === 0 || i === this.list.length - 1;
           const isEntrySpot = this.entryIndexes.includes(i);
-          if (isFocus) {
-            ctx.save();
-            ctx.fillStyle = "#fff";
-            ctx.beginPath();
-            ctx.arc(x, y, DOT_SIZE - 2, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.restore();
-          } else if (isEntrySpot) {
+          if (isEntrySpot) {
             ctx.save();
             ctx.fillStyle = THEME_GRAPH_BG;
             ctx.beginPath();
@@ -166,13 +159,32 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
             ctx.restore();
           } else if (isEdge) {
             ctx.save();
-            ctx.fillStyle = "#fff";
+            ctx.fillStyle = THEME_GRAPH_BG;
             ctx.fillRect(
               x - EDGE_DOT_SIZE * 0.5,
               y - EDGE_DOT_SIZE * 0.5,
               EDGE_DOT_SIZE,
               EDGE_DOT_SIZE
             );
+            ctx.strokeRect(
+              x - EDGE_DOT_SIZE * 0.5,
+              y - EDGE_DOT_SIZE * 0.5,
+              EDGE_DOT_SIZE,
+              EDGE_DOT_SIZE
+            );
+            ctx.restore();
+          }
+          if (isFocus) {
+            ctx.save();
+            ctx.fillStyle = "#fff";
+            if (isEdge) {
+              const size = EDGE_DOT_SIZE - 4;
+              ctx.fillRect(x - size * 0.5, y - size * 0.5, size, size);
+            } else {
+              ctx.beginPath();
+              ctx.arc(x, y, DOT_SIZE - 2, 0, Math.PI * 2);
+              ctx.fill();
+            }
             ctx.restore();
           }
         });
