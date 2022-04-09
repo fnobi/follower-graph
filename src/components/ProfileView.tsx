@@ -63,19 +63,16 @@ const idStyle = css({
 const ProfileView: FC<{ name: string; account: TwitterAccount }> = ({
   name,
   account
-}) => {
-  const style = useAccountIcon(account);
-  return (
-    <div css={wrapperStyle}>
-      <div css={contentStyle}>
-        <div css={iconStyle} style={style} />
-        <div>
-          <div css={idStyle}>@{name}</div>
-          <div>{account.name}</div>
-        </div>
+}) => (
+  <div css={wrapperStyle}>
+    <div css={contentStyle}>
+      <div css={iconStyle} style={useAccountIcon(account)} />
+      <div>
+        <div css={idStyle}>@{name}</div>
+        <div>{account.name}</div>
       </div>
     </div>
-  );
-};
+  </div>
+);
 
 export default ProfileView;

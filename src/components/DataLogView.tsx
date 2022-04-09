@@ -49,6 +49,15 @@ const headerStyle = css({
   alignItems: "center"
 });
 
+const headerLeftStyle = css({
+  flexGrow: 1,
+  width: "100%"
+});
+
+const headerRightStyle = css({
+  display: "flex"
+});
+
 const profileViewStyle = css({
   position: "absolute",
   width: percent(100),
@@ -283,13 +292,13 @@ const DataLogView = (props: { twitterId: string; onBack?: () => void }) => {
         </div>
       </div>
       <div css={headerStyle}>
-        <div style={{ flexGrow: 1, width: "100%" }}>
+        <div css={headerLeftStyle}>
           <button type="button" css={buttonLinkStyle} onClick={onBack}>
             &lt;
           </button>
         </div>
         {twitterId ? (
-          <div style={{ display: "flex" }}>
+          <div css={headerRightStyle}>
             <select
               value={filter}
               onChange={e => {
