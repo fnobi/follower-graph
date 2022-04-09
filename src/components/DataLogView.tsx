@@ -22,7 +22,8 @@ import {
 import {
   buttonLinkStyle,
   buttonReset,
-  CUSTOM_FONT_FAMILY
+  CUSTOM_FONT_FAMILY,
+  THEME_HIGHLIGHT
 } from "~/local/commonCss";
 import { useMeStore } from "~/local/useMeStore";
 import { formatDateTime } from "~/local/dateUtil";
@@ -37,19 +38,6 @@ const GraphPolygonView = dynamic(
   () => import("~/components/GraphPolygonView"),
   { ssr: false }
 );
-
-const centerLineStyle = css({
-  position: "fixed",
-  left: percent(50),
-  bottom: percent(0),
-  borderRight: `solid ${px(1)} #00f`,
-  [MQ_MOBILE]: {
-    top: spp(200)
-  },
-  [MQ_DESKTOP]: {
-    top: pcp(200)
-  }
-});
 
 const headerStyle = css({
   position: "fixed",
@@ -79,7 +67,7 @@ const mainStyle = css({
   position: "absolute",
   bottom: percent(0),
   width: percent(100),
-  background: "#00f",
+  background: THEME_HIGHLIGHT,
   "&:before": {
     content: "''",
     display: "block",
@@ -87,7 +75,7 @@ const mainStyle = css({
     left: percent(50),
     bottom: percent(100),
     borderStyle: "solid",
-    borderColor: "transparent transparent #00f transparent"
+    borderColor: `transparent transparent ${THEME_HIGHLIGHT} transparent`
   },
   [MQ_MOBILE]: {
     height: spp(650),
@@ -174,6 +162,30 @@ const DataLogView = (props: { twitterId: string; onBack?: () => void }) => {
     );
   }, [list]);
 
+  const axisIndexes = useMemo(() => {
+    const indexes: number[] = [];
+    (list || []).reduce((prev, item, i) => {
+      const d = new Date(item.createdAt);
+      const factor = (() => {
+        switch (filter) {
+          case "hours":
+            return d.getDate();
+          case "days":
+            return d.getMonth();
+          case "monthes":
+            return d.getFullYear();
+          default:
+            return 0;
+        }
+      })();
+      if (prev >= 0 && factor !== prev) {
+        indexes.push(i - 1);
+      }
+      return factor;
+    }, -1);
+    return indexes;
+  }, [list]);
+
   const focusIndex = useMemo(() => {
     if (!list) {
       return 0;
@@ -241,10 +253,10 @@ const DataLogView = (props: { twitterId: string; onBack?: () => void }) => {
 
   return (
     <div>
-      <div css={centerLineStyle} />
       <GraphPolygonView
         list={list}
         entryIndexes={tweetEntries.map(t => t.index)}
+        axisIndexes={axisIndexes}
         scroll={scroll}
         onScroll={handleScroll}
       />

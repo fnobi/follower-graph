@@ -1,5 +1,6 @@
 import { CanvasPlayer } from "~/lib/useCanvasAgent";
 import { minBy, maxBy, mix } from "~/lib/lodashLike";
+import { THEME_BG, THEME_HIGHLIGHT } from "~/local/commonCss";
 import { TwitterData } from "~/scheme/TwitterData";
 import { calcFocusIndex } from "~/components/GraphPolygonView";
 
@@ -29,6 +30,8 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
 
   private entryIndexes: number[] = [];
 
+  private axisIndexes: number[] = [];
+
   public constructor() {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
@@ -42,6 +45,10 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
 
   public setEntryIndexes(is: number[]) {
     this.entryIndexes = [...is];
+  }
+
+  public setAxisIndexes(is: number[]) {
+    this.axisIndexes = [...is];
   }
 
   public setScroll(num: number) {
@@ -97,6 +104,13 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
       const focusIndex = calcFocusIndex(this.list, scroll);
 
       ctx.save();
+      ctx.strokeStyle = THEME_HIGHLIGHT;
+      ctx.moveTo(0, -vh / 2);
+      ctx.lineTo(0, vh / 2);
+      ctx.stroke();
+      ctx.restore();
+
+      ctx.save();
       ctx.globalAlpha = 0.3;
       ctx.beginPath();
       yAxises
@@ -111,6 +125,12 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
           ctx.moveTo(-vw / 2, y);
           ctx.lineTo(vw / 2, y);
         });
+      points.forEach(({ x }, i) => {
+        if (this.axisIndexes.includes(i)) {
+          ctx.moveTo(x, -vh / 2);
+          ctx.lineTo(x, vh / 2);
+        }
+      });
       ctx.stroke();
       ctx.restore();
 
@@ -131,7 +151,7 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
           const isEntrySpot = this.entryIndexes.includes(i);
           if (isEntrySpot) {
             ctx.save();
-            ctx.fillStyle = "#003";
+            ctx.fillStyle = THEME_BG;
             ctx.beginPath();
             ctx.arc(x, y, DOT_SIZE, 0, Math.PI * 2);
             ctx.fill();
