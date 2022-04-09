@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { css } from "@emotion/react";
-import { pcp, percent, spp } from "~/lib/cssUtil";
+import { pcp, percent, px, spp } from "~/lib/cssUtil";
 import useCanvasAgent from "~/lib/useCanvasAgent";
 import Dragger from "~/lib/Dragger";
 import { MQ_DESKTOP, MQ_MOBILE } from "~/lib/MQ";
@@ -16,6 +16,7 @@ const canvasStyle = css({
   left: percent(0),
   width: percent(100),
   backgroundColor: THEME_GRAPH_BG,
+  borderTop: `solid ${px(1)} rgba(255,255,255,0.2)`,
   canvas: {
     position: "absolute",
     top: percent(0),

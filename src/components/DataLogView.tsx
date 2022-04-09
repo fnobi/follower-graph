@@ -23,6 +23,8 @@ import {
   buttonLinkStyle,
   buttonReset,
   CUSTOM_FONT_FAMILY,
+  THEME_BG,
+  THEME_BUTTON,
   THEME_HIGHLIGHT
 } from "~/local/commonCss";
 import { useMeStore } from "~/local/useMeStore";
@@ -77,6 +79,7 @@ const mainStyle = css({
   bottom: percent(0),
   width: percent(100),
   background: THEME_HIGHLIGHT,
+  color: THEME_BG,
   "&:before": {
     content: "''",
     display: "block",
@@ -131,9 +134,11 @@ const entryViewStyle = css({
 });
 
 const filterSelectStyle = css(buttonReset, {
-  border: `solid ${px(1)} #fff`,
+  backgroundColor: THEME_BUTTON,
+  color: THEME_BG,
+  border: `solid ${px(1)} #000`,
   padding: em(0, 0.5),
-  boxShadow: `${px(1)} ${px(2)} ${px(0)} #fff`,
+  boxShadow: `${px(1)} ${px(2)} ${px(0)} #000`,
   transform: `translate(${px(-1)},${px(-2)})`
 });
 

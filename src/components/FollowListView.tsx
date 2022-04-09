@@ -11,7 +11,11 @@ import {
   profileFollowCollectionRef,
   twitterDocumentRef
 } from "~/local/database";
-import { buttonLinkStyle, CUSTOM_FONT_FAMILY } from "~/local/commonCss";
+import {
+  buttonLinkStyle,
+  CUSTOM_FONT_FAMILY,
+  THEME_GRAPH_BG
+} from "~/local/commonCss";
 import { useMeStore } from "~/local/useMeStore";
 import { firebaseAuth } from "~/local/firebaseApp";
 import useAccountIcon from "~/local/useAccountIcon";
@@ -77,9 +81,10 @@ const accountCellStyle = css({
   display: "flex",
   justifyContent: "flex-start",
   alignItems: "center",
-  border: `solid ${px(1)} #fff`,
+  border: `solid ${px(1)} #000`,
   textAlign: "left",
-  boxShadow: `${px(1)} ${px(2)} ${px(0)} #fff`,
+  backgroundColor: THEME_GRAPH_BG,
+  boxShadow: `${px(1)} ${px(2)} ${px(0)} #000`,
   transform: `translate(${px(-1)},${px(-2)})`,
   "&:hover": {
     boxShadow: "none",
@@ -141,8 +146,8 @@ const AccountCell = (props: { id: string }) => {
   }, [id]);
 
   return (
-    <Link href={href}>
-      <a href={href} css={accountCellStyle}>
+    <Link href={href} passHref>
+      <a href="passHref" css={accountCellStyle}>
         <div css={cellIconStyle} style={twitterAccountIconStyle} />
         <div css={cellTextStyle}>
           <strong>@{id}</strong>
