@@ -1,6 +1,6 @@
 import { css } from "@emotion/react";
 import dynamic from "next/dynamic";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, FC } from "react";
 import { em, pcp, percent, spp } from "~/lib/cssUtil";
 import {
   deleteDoc,
@@ -141,8 +141,10 @@ const filterSelectStyle = css(buttonReset, commonShadowStyle, {
 });
 
 // eslint-disable-next-line react/require-default-props
-const DataLogView = (props: { twitterId: string; onBack?: () => void }) => {
-  const { twitterId, onBack } = props;
+const DataLogScene: FC<{ twitterId: string; onBack?: () => void }> = ({
+  twitterId,
+  onBack
+}) => {
   const router = useRouter();
   const { user } = useMeStore();
   const [list, setList] = useState<TwitterData[] | null>(null);
@@ -340,4 +342,4 @@ const DataLogView = (props: { twitterId: string; onBack?: () => void }) => {
   );
 };
 
-export default DataLogView;
+export default DataLogScene;

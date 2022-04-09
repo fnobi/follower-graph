@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { FC, useEffect, useRef } from "react";
 import { css } from "@emotion/react";
 import { pcp, percent, px, spp } from "~/lib/cssUtil";
 import useCanvasAgent from "~/lib/useCanvasAgent";
@@ -34,14 +34,13 @@ const canvasStyle = css({
   }
 });
 
-const GraphPolygonView = (props: {
+const GraphPolygonView: FC<{
   list: TwitterData[];
   entryIndexes: number[];
   axisIndexes: number[];
   scroll: number;
   onScroll: (fn: (s: number) => number) => void;
-}) => {
-  const { list, entryIndexes, axisIndexes, scroll, onScroll } = props;
+}> = ({ list, entryIndexes, axisIndexes, scroll, onScroll }) => {
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const { playerRef } = useCanvasAgent({
     initializer: () => new GraphPolygonPlayer(),

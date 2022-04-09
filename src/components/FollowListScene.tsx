@@ -151,7 +151,7 @@ const AccountCell = (props: { id: string }) => {
   );
 };
 
-const FollowListView = () => {
+const FollowListScene = () => {
   const router = useRouter();
   const { user } = useMeStore();
   const [twtterList, setTwtterList] = useState<string[]>([]);
@@ -198,4 +198,4 @@ const FollowListView = () => {
   );
 };
 
-export default FollowListView;
+export default FollowListScene;
