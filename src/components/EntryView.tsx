@@ -3,7 +3,7 @@ import { onSnapshot } from "firebase/firestore";
 import { FC, useEffect, useMemo, useState } from "react";
 import { em, pcp, px, spp } from "~/lib/cssUtil";
 import { MQ_DESKTOP, MQ_MOBILE } from "~/lib/MQ";
-import { THEME_BG } from "~/local/commonCss";
+import { THEME_TOOLTIP_BG } from "~/local/commonCss";
 import { twitterEntryDocumentRef } from "~/local/database";
 import { formatDateTime } from "~/local/dateUtil";
 import { parseTwitterEntry, TwitterEntry } from "~/scheme/TwitterEntry";
@@ -11,7 +11,7 @@ import { parseTwitterEntry, TwitterEntry } from "~/scheme/TwitterEntry";
 const wrapperStyle = css({
   "--focusColor": "#fff",
   display: "block",
-  backgroundColor: THEME_BG,
+  backgroundColor: THEME_TOOLTIP_BG,
   color: "var(--focusColor)",
   border: `solid ${px(1)} rgba(255,255,255,0.2)`,
   padding: em(0.8),
@@ -19,8 +19,14 @@ const wrapperStyle = css({
     color: "inherit",
     textDecoration: "none"
   },
-  [MQ_MOBILE]: { fontSize: spp(30) },
-  [MQ_DESKTOP]: { fontSize: pcp(30) }
+  [MQ_MOBILE]: {
+    padding: spp(20),
+    fontSize: spp(30)
+  },
+  [MQ_DESKTOP]: {
+    padding: pcp(20),
+    fontSize: pcp(30)
+  }
 });
 
 const mainTextStyle = css({});

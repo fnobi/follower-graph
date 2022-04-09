@@ -3,8 +3,9 @@ import { em, pcp, px, spp } from "~/lib/cssUtil";
 import { MQ_DESKTOP, MQ_MOBILE } from "~/lib/MQ";
 
 export const THEME_HIGHLIGHT = "#007";
-export const THEME_BG = "#003";
+export const THEME_BG = "#007";
 export const THEME_GRAPH_BG = "#000";
+export const THEME_TOOLTIP_BG = "#003";
 
 export const globalStyle = css({
   body: {

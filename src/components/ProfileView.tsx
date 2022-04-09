@@ -2,7 +2,7 @@ import { css } from "@emotion/react";
 import { FC } from "react";
 import { em, pcp, px, spp } from "~/lib/cssUtil";
 import { MQ_DESKTOP, MQ_MOBILE } from "~/lib/MQ";
-import { CUSTOM_FONT_FAMILY } from "~/local/commonCss";
+import { CUSTOM_FONT_FAMILY, THEME_TOOLTIP_BG } from "~/local/commonCss";
 import useAccountIcon from "~/local/useAccountIcon";
 import { TwitterAccount } from "~/scheme/TwitterAccount";
 
@@ -24,13 +24,13 @@ const contentStyle = css({
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
-  backgroundColor: "#000",
+  backgroundColor: THEME_TOOLTIP_BG,
   border: `solid ${px(1)} rgba(255,255,255,0.2)`,
   [MQ_MOBILE]: {
-    padding: spp(15)
+    padding: spp(20)
   },
   [MQ_DESKTOP]: {
-    padding: pcp(15)
+    padding: pcp(20)
   }
 });
 
