@@ -21,7 +21,7 @@ const PageCreate = () => {
           css={buttonLinkStyle}
           onClick={() => router.push("/")}
         >
-          &lt;back
+          &lt;
         </button>
       </div>
     </div>
