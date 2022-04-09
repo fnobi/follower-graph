@@ -4,7 +4,8 @@ import { TwitterData } from "~/scheme/TwitterData";
 import { calcFocusIndex } from "~/components/GraphPolygonView";
 
 const VIEWPORT = 450;
-const DOT_SIZE = 4;
+const DOT_SIZE = 5;
+const EDGE_DOT_SIZE = 8;
 const GRAPH_PADDING = 20;
 
 const calcYUnit = (diff: number) => {
@@ -115,17 +116,6 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
       ctx.restore();
 
       if (scaledPoints.length > 1) {
-        scaledPoints.forEach(({ x, y }, i) => {
-          const isFocus = i === focusIndex;
-          if (isFocus) {
-            ctx.save();
-            ctx.fillStyle = "#fff";
-            ctx.beginPath();
-            ctx.arc(x, y, DOT_SIZE * 0.5, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.restore();
-          }
-        });
         ctx.beginPath();
         scaledPoints.forEach(({ x, y }, i) => {
           if (i) {
@@ -137,29 +127,34 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
         ctx.stroke();
 
         scaledPoints.forEach(({ x, y }, i) => {
+          const isFocus = i === focusIndex;
           const isEdge = i === 0 || i === this.list.length - 1;
           const isEntrySpot = this.entryIndexes.includes(i);
           if (isEntrySpot) {
-            const markWidth = 8;
-            const markHeight = 6;
-            const yOffset = -8;
-            ctx.save();
-            ctx.fillStyle = "#0ff";
-            ctx.beginPath();
-            ctx.moveTo(x, y + yOffset);
-            ctx.lineTo(x - markWidth / 2, y - markHeight + yOffset);
-            ctx.lineTo(x + markWidth / 2, y - markHeight + yOffset);
-            ctx.lineTo(x, y + yOffset);
-            ctx.fill();
-            ctx.restore();
-          }
-          if (isEdge) {
             ctx.save();
             ctx.fillStyle = "#003";
             ctx.beginPath();
             ctx.arc(x, y, DOT_SIZE, 0, Math.PI * 2);
             ctx.fill();
             ctx.stroke();
+            ctx.restore();
+          }
+          if (isFocus) {
+            ctx.save();
+            ctx.fillStyle = "#fff";
+            ctx.beginPath();
+            ctx.arc(x, y, DOT_SIZE - 2, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+          } else if (isEdge) {
+            ctx.save();
+            ctx.fillStyle = "#fff";
+            ctx.fillRect(
+              x - EDGE_DOT_SIZE * 0.5,
+              y - EDGE_DOT_SIZE * 0.5,
+              EDGE_DOT_SIZE,
+              EDGE_DOT_SIZE
+            );
             ctx.restore();
           }
         });
