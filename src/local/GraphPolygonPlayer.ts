@@ -6,7 +6,7 @@ import { calcFocusIndex } from "~/components/GraphPolygonView";
 
 const VIEWPORT = 450;
 const DOT_SIZE = 5;
-const EDGE_DOT_SIZE = 8;
+const EDGE_DOT_SIZE = 9;
 const GRAPH_PADDING = 20;
 
 const calcYUnit = (diff: number) => {
