@@ -1,10 +1,10 @@
 import { css } from "@emotion/react";
 import { onSnapshot } from "firebase/firestore";
 import { FC, useEffect, useMemo, useState } from "react";
-import { em, pcp, percent, px, spp } from "~/lib/cssUtil";
-import { padLeft } from "~/lib/lodashLike";
+import { em, pcp, px, spp } from "~/lib/cssUtil";
 import { MQ_DESKTOP, MQ_MOBILE } from "~/lib/MQ";
 import { twitterEntryDocumentRef } from "~/local/database";
+import { formatDateTime } from "~/local/dateUtil";
 import { parseTwitterEntry, TwitterEntry } from "~/scheme/TwitterEntry";
 
 const wrapperStyle = css({
@@ -25,7 +25,6 @@ const wrapperStyle = css({
 const mainTextStyle = css({});
 
 const dateStyle = css({
-  fontSize: percent(50),
   textAlign: "right"
 });
 
@@ -51,10 +50,7 @@ const EntryView: FC<{
       return "";
     }
     const d = new Date(entry.createdAt);
-    return [
-      [d.getMonth() + 1, d.getDate()].join("/"),
-      [d.getHours(), d.getMinutes()].map(n => padLeft(n, 2)).join(":")
-    ].join(" ");
+    return formatDateTime(d);
   }, [entry]);
 
   useEffect(() => {

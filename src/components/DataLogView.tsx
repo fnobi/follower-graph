@@ -12,7 +12,7 @@ import {
   where
 } from "firebase/firestore";
 import { useRouter } from "next/router";
-import { clamp, flatten, padLeft, sortBy, uniq } from "~/lib/lodashLike";
+import { clamp, flatten, sortBy, uniq } from "~/lib/lodashLike";
 import { MQ_DESKTOP, MQ_MOBILE } from "~/lib/MQ";
 import {
   profileFollowDocumentRef,
@@ -25,6 +25,7 @@ import {
   CUSTOM_FONT_FAMILY
 } from "~/local/commonCss";
 import { useMeStore } from "~/local/useMeStore";
+import { formatDateTime } from "~/local/dateUtil";
 import { parseTwitterData, TwitterData } from "~/scheme/TwitterData";
 import { parseTwitterAccount, TwitterAccount } from "~/scheme/TwitterAccount";
 import ProfileView from "~/components/ProfileView";
@@ -176,12 +177,7 @@ const DataLogView = (props: { twitterId: string; onBack?: () => void }) => {
       return null;
     }
     const d = new Date(focusItem.createdAt);
-    return [
-      [d.getFullYear(), d.getMonth() + 1, d.getDate()]
-        .map(n => padLeft(n, 2))
-        .join("/"),
-      [d.getHours(), d.getMinutes()].map(n => padLeft(n, 2)).join(":")
-    ].join(" ");
+    return formatDateTime(d);
   }, [focusItem]);
 
   const handleScroll = (fn: (s: number) => number) => {
