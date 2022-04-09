@@ -70,18 +70,27 @@ export const responsiveImageTile = (
     }
   });
 
-export const buttonLinkStyle = css(buttonReset, {
+export const commonShadowStyle = css({
+  border: `solid ${px(1)} #000`,
+  [MQ_MOBILE]: {
+    boxShadow: `${spp(8)} ${spp(8)} ${spp(0)} #000`,
+    transform: `translate(${spp(-8)},${spp(-8)})`
+  },
+  [MQ_DESKTOP]: {
+    boxShadow: `${pcp(10)} ${pcp(10)} ${pcp(0)} #000`,
+    transform: `translate(${pcp(-10)},${pcp(-10)})`,
+    "&:hover": {
+      boxShadow: "none",
+      cursor: "pointer",
+      transform: `translate(${pcp(0)},${pcp(0)})`
+    }
+  }
+});
+
+export const buttonLinkStyle = css(buttonReset, commonShadowStyle, {
   backgroundColor: THEME_BUTTON,
   color: THEME_BG,
-  border: `solid ${px(1)} #000`,
-  padding: em(0.2, 0.6),
-  boxShadow: `${px(1)} ${px(2)} ${px(0)} #000`,
-  transform: `translate(${px(-1)},${px(-2)})`,
-  "&:hover": {
-    boxShadow: "none",
-    cursor: "pointer",
-    transform: `translate(${px(0)},${px(0)})`
-  }
+  padding: em(0.2, 0.6)
 });
 
 export const CUSTOM_FONT_FAMILY = "'Bebas Neue', cursive";

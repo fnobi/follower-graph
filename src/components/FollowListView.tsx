@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import { onSnapshot, query, orderBy } from "firebase/firestore";
 import { css } from "@emotion/react";
-import { em, pcp, percent, px, spp } from "~/lib/cssUtil";
+import { em, pcp, percent, spp } from "~/lib/cssUtil";
 import { signOut } from "firebase/auth";
 import { MQ_DESKTOP, MQ_MOBILE } from "~/lib/MQ";
 import {
@@ -13,6 +13,7 @@ import {
 } from "~/local/database";
 import {
   buttonLinkStyle,
+  commonShadowStyle,
   CUSTOM_FONT_FAMILY,
   THEME_GRAPH_BG
 } from "~/local/commonCss";
@@ -74,23 +75,15 @@ const footerStyle = css({
   right: em(1)
 });
 
-const accountCellStyle = css({
+const accountCellStyle = css(commonShadowStyle, {
   color: "inherit",
   textDecoration: "none",
   padding: 0,
   display: "flex",
   justifyContent: "flex-start",
   alignItems: "center",
-  border: `solid ${px(1)} #000`,
   textAlign: "left",
   backgroundColor: THEME_GRAPH_BG,
-  boxShadow: `${px(1)} ${px(2)} ${px(0)} #000`,
-  transform: `translate(${px(-1)},${px(-2)})`,
-  "&:hover": {
-    boxShadow: "none",
-    cursor: "pointer",
-    transform: `translate(${px(0)},${px(0)})`
-  },
   [MQ_MOBILE]: {
     width: spp(955)
   },

@@ -1,7 +1,7 @@
 import { css } from "@emotion/react";
 import dynamic from "next/dynamic";
 import { useState, useEffect, useMemo } from "react";
-import { em, pcp, percent, px, spp } from "~/lib/cssUtil";
+import { em, pcp, percent, spp } from "~/lib/cssUtil";
 import {
   deleteDoc,
   limit,
@@ -22,6 +22,7 @@ import {
 import {
   buttonLinkStyle,
   buttonReset,
+  commonShadowStyle,
   CUSTOM_FONT_FAMILY,
   THEME_BG,
   THEME_BUTTON,
@@ -133,13 +134,10 @@ const entryViewStyle = css({
   }
 });
 
-const filterSelectStyle = css(buttonReset, {
+const filterSelectStyle = css(buttonReset, commonShadowStyle, {
   backgroundColor: THEME_BUTTON,
   color: THEME_BG,
-  border: `solid ${px(1)} #000`,
-  padding: em(0, 0.5),
-  boxShadow: `${px(1)} ${px(2)} ${px(0)} #000`,
-  transform: `translate(${px(-1)},${px(-2)})`
+  padding: em(0, 0.5)
 });
 
 // eslint-disable-next-line react/require-default-props
