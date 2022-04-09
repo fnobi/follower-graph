@@ -6,13 +6,14 @@ import { TwitterData } from "~/scheme/TwitterData";
 import { calcFocusIndex } from "~/components/GraphPolygonView";
 
 const VIEWPORT = 450;
-const GRAPH_HEIGHT = 80;
 const DOT_SIZE = 4;
 const FONT_SIZE = 45;
 const HIGHLIGHT_PADDING = 10;
+const SCROLL_GRAPH_HEIGHT = 160;
 const SCROLL_GRAPH_UNIT = 10;
-const SCROLL_GRAPH_OFFSET_Y = 120;
-const STATIC_GRAPH_OFFSET_Y = -120;
+const SCROLL_GRAPH_OFFSET_Y = -100;
+const STATIC_GRAPH_HEIGHT = 10;
+const STATIC_GRAPH_OFFSET_Y = -220;
 
 const makeFont = (size: number) =>
   [[px(size), px(size)].join("/"), CUSTOM_FONT_FAMILY].join(" ");
@@ -101,11 +102,11 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
       );
       const points1 = ys.map((y, i) => ({
         x: -i * SCROLL_GRAPH_UNIT + scrollOffset,
-        y: mix(GRAPH_HEIGHT, 0, y) - GRAPH_HEIGHT * 0.5
+        y: mix(SCROLL_GRAPH_HEIGHT, 0, y) - SCROLL_GRAPH_HEIGHT * 0.5
       }));
       const points2 = ys.map((y, i) => ({
         x: staticGraphRight - (vw / mc) * i,
-        y: mix(GRAPH_HEIGHT, 0, y) - GRAPH_HEIGHT * 0.5
+        y: mix(STATIC_GRAPH_HEIGHT, 0, y) - STATIC_GRAPH_HEIGHT * 0.5
       }));
       const focusIndex = calcFocusIndex(this.list, scroll);
       const focusItem = this.list[focusIndex];
@@ -114,17 +115,19 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
         {
           points: points1,
           offsetY: SCROLL_GRAPH_OFFSET_Y,
+          height: SCROLL_GRAPH_HEIGHT,
           rangeStart: -vw / 2,
           rangeWidth: vw
         },
         {
           points: points2,
           offsetY: STATIC_GRAPH_OFFSET_Y,
+          height: STATIC_GRAPH_HEIGHT,
           rangeStart:
             staticGraphRight - staticGraphLength * scroll - highlightWidth / 2,
           rangeWidth: highlightWidth
         }
-      ].forEach(({ points, offsetY, rangeStart, rangeWidth }) => {
+      ].forEach(({ points, offsetY, height, rangeStart, rangeWidth }) => {
         ctx.save();
         ctx.translate(0, offsetY);
 
@@ -132,9 +135,9 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
         ctx.fillStyle = "#008";
         ctx.fillRect(
           rangeStart,
-          -GRAPH_HEIGHT * 0.5 - HIGHLIGHT_PADDING,
+          -height * 0.5 - HIGHLIGHT_PADDING,
           rangeWidth,
-          GRAPH_HEIGHT + HIGHLIGHT_PADDING * 2
+          height + HIGHLIGHT_PADDING * 2
         );
         ctx.restore();
 
@@ -144,8 +147,8 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
         yAxises
           .map(v =>
             mix(
-              GRAPH_HEIGHT / 2,
-              -GRAPH_HEIGHT / 2,
+              height / 2,
+              -height / 2,
               minCount === maxCount
                 ? 0.5
                 : (v - minCount) / (maxCount - minCount)
@@ -208,10 +211,10 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
         ctx.textBaseline = "middle";
 
         ctx.font = makeFont(FONT_SIZE);
-        ctx.fillText(focusItem.followersCount.toLocaleString(), 0, 0);
+        ctx.fillText(focusItem.followersCount.toLocaleString(), 0, 50);
 
         ctx.font = makeFont(FONT_SIZE * 0.5);
-        ctx.fillText(dateString, 0, FONT_SIZE * 1);
+        ctx.fillText(dateString, 0, 100);
         ctx.restore();
       }
     }
