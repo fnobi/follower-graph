@@ -102,11 +102,11 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
       );
       const points1 = ys.map((y, i) => ({
         x: -i * SCROLL_GRAPH_UNIT + scrollOffset,
-        y: mix(SCROLL_GRAPH_HEIGHT, 0, y) - SCROLL_GRAPH_HEIGHT * 0.5
+        y
       }));
       const points2 = ys.map((y, i) => ({
         x: staticGraphRight - (vw / mc) * i,
-        y: mix(STATIC_GRAPH_HEIGHT, 0, y) - STATIC_GRAPH_HEIGHT * 0.5
+        y
       }));
       const focusIndex = calcFocusIndex(this.list, scroll);
       const focusItem = this.list[focusIndex];
@@ -128,6 +128,11 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
           rangeWidth: highlightWidth
         }
       ].forEach(({ points, offsetY, height, rangeStart, rangeWidth }) => {
+        const scaledPoints = points.map(({ x, y }) => ({
+          x,
+          y: mix(height, 0, y) - height * 0.5
+        }));
+
         ctx.save();
         ctx.translate(0, offsetY);
 
@@ -161,9 +166,9 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
         ctx.stroke();
         ctx.restore();
 
-        if (points.length > 1) {
+        if (scaledPoints.length > 1) {
           ctx.beginPath();
-          points.forEach(({ x, y }, i) => {
+          scaledPoints.forEach(({ x, y }, i) => {
             if (i) {
               ctx.lineTo(x, y);
             } else {
@@ -172,7 +177,7 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
           });
           ctx.stroke();
 
-          points.forEach(({ x, y }, i) => {
+          scaledPoints.forEach(({ x, y }, i) => {
             const isEdge = i === 0 || i === this.list.length - 1;
             const isFocus = i === focusIndex;
             const isEntrySpot = this.entryIndexes.includes(i);
