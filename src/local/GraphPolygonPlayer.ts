@@ -46,6 +46,7 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
 
   public setScroll(num: number) {
     this.scroll = num;
+    this.render();
   }
 
   private render() {
@@ -53,6 +54,7 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
     if (!ctx || !canvas) {
       return;
     }
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.save();
     ctx.translate(canvas.width / 2, canvas.height / 2);
@@ -82,20 +84,17 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
       const yAxises = new Array(yLineCount)
         .fill(0)
         .map((z, i) => yAxisStart + i * yUnit);
-
-      const ys = this.list.map(({ followersCount: count }) =>
-        minCount === maxCount ? 0.5 : (count - minCount) / (maxCount - minCount)
-      );
-      const points = ys.map((y, i) => ({
-        x: -i * graphUnit + scrollOffset,
-        y
-      }));
+      const points = this.list
+        .map(({ followersCount: count }) =>
+          minCount === maxCount
+            ? 0.5
+            : (count - minCount) / (maxCount - minCount)
+        )
+        .map((y, i) => ({
+          x: -i * graphUnit + scrollOffset,
+          y: mix(graphHeight, 0, y) - graphHeight * 0.5
+        }));
       const focusIndex = calcFocusIndex(this.list, scroll);
-
-      const scaledPoints = points.map(({ x, y }) => ({
-        x,
-        y: mix(graphHeight, 0, y) - graphHeight * 0.5
-      }));
 
       ctx.save();
       ctx.globalAlpha = 0.3;
@@ -115,9 +114,9 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
       ctx.stroke();
       ctx.restore();
 
-      if (scaledPoints.length > 1) {
+      if (points.length > 1) {
         ctx.beginPath();
-        scaledPoints.forEach(({ x, y }, i) => {
+        points.forEach(({ x, y }, i) => {
           if (i) {
             ctx.lineTo(x, y);
           } else {
@@ -126,7 +125,7 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
         });
         ctx.stroke();
 
-        scaledPoints.forEach(({ x, y }, i) => {
+        points.forEach(({ x, y }, i) => {
           const isFocus = i === focusIndex;
           const isEdge = i === 0 || i === this.list.length - 1;
           const isEntrySpot = this.entryIndexes.includes(i);
@@ -163,9 +162,8 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
     ctx.restore();
   }
 
-  public update() {
-    this.render();
-  }
+  // eslint-disable-next-line class-methods-use-this
+  public update() {}
 
   public resize() {
     const { canvas } = this;
