@@ -97,15 +97,15 @@ const mainStyle = css({
   [MQ_MOBILE]: {
     height: spp(700),
     "&:before": {
-      borderWidth: spp(0, 50, 50, 50),
-      marginLeft: spp(-50)
+      borderWidth: pcp(0, 30, 30, 30),
+      marginLeft: pcp(-30)
     }
   },
   [MQ_DESKTOP]: {
     height: pcp(650),
     "&:before": {
-      borderWidth: pcp(0, 50, 50, 50),
-      marginLeft: pcp(-50)
+      borderWidth: pcp(0, 40, 40, 40),
+      marginLeft: pcp(-40)
     }
   }
 });

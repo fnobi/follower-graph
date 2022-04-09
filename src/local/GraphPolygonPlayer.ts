@@ -209,7 +209,7 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
     const resolution = window.devicePixelRatio;
     canvas.width = canvas.offsetWidth * resolution;
     canvas.height = canvas.offsetHeight * resolution;
-    this.scale = Math.min(canvas.width, canvas.height) / VIEWPORT;
+    this.scale = canvas.height / VIEWPORT;
     this.render();
   }
 
