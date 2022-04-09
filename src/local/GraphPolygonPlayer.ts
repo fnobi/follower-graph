@@ -5,12 +5,11 @@ import { calcFocusIndex } from "~/components/GraphPolygonView";
 
 const VIEWPORT = 450;
 const DOT_SIZE = 4;
-const HIGHLIGHT_PADDING = 10;
-const SCROLL_GRAPH_HEIGHT = 160;
-const SCROLL_GRAPH_UNIT = 10;
-const SCROLL_GRAPH_OFFSET_Y = -100;
-const STATIC_GRAPH_HEIGHT = 10;
-const STATIC_GRAPH_OFFSET_Y = -220;
+const GRAPH_HEIGHT = 160;
+const GRAPH_UNIT = 10;
+const GRAPH_OFFSET_Y = -100;
+const SCROLL_BAR_OFFSET_Y = -200;
+const SCROLL_BAR_HEIGHT = 4;
 
 const calcYUnit = (diff: number) => {
   let p = 3;
@@ -41,7 +40,7 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
   }
 
   public setList(list: TwitterData[]) {
-    this.list = list;
+    this.list = [...list];
   }
 
   public setEntryIndexes(is: number[]) {
@@ -50,10 +49,6 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
 
   public setScroll(num: number) {
     this.scroll = num;
-  }
-
-  public scrollBy(delta: number) {
-    this.setScroll(this.scroll + delta);
   }
 
   private render() {
@@ -76,9 +71,10 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
         this.list,
         item => item.followersCount
       );
-      const scrollLength = (this.list.length - 1) * SCROLL_GRAPH_UNIT;
+      const scrollLength = (this.list.length - 1) * GRAPH_UNIT;
       const scrollOffset = scrollLength * scroll;
       const vw = canvas.width / this.scale;
+      const vh = canvas.height / this.scale;
       const cc = this.list.length - 1;
       const mc = this.list.length + 1;
       const staticGraphRight = (0.5 - 1 / mc) * vw;
@@ -94,105 +90,104 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
       const ys = this.list.map(({ followersCount: count }) =>
         minCount === maxCount ? 0.5 : (count - minCount) / (maxCount - minCount)
       );
-      const points1 = ys.map((y, i) => ({
-        x: -i * SCROLL_GRAPH_UNIT + scrollOffset,
-        y
-      }));
-      const points2 = ys.map((y, i) => ({
-        x: staticGraphRight - (vw / mc) * i,
+      const points = ys.map((y, i) => ({
+        x: -i * GRAPH_UNIT + scrollOffset,
         y
       }));
       const focusIndex = calcFocusIndex(this.list, scroll);
+      const highlightstart =
+        staticGraphRight - staticGraphLength * scroll - highlightWidth / 2;
 
-      [
-        {
-          points: points1,
-          offsetY: SCROLL_GRAPH_OFFSET_Y,
-          height: SCROLL_GRAPH_HEIGHT,
-          rangeStart: -vw / 2,
-          rangeWidth: vw
-        },
-        {
-          points: points2,
-          offsetY: STATIC_GRAPH_OFFSET_Y,
-          height: STATIC_GRAPH_HEIGHT,
-          rangeStart:
-            staticGraphRight - staticGraphLength * scroll - highlightWidth / 2,
-          rangeWidth: highlightWidth
-        }
-      ].forEach(({ points, offsetY, height, rangeStart, rangeWidth }) => {
-        const scaledPoints = points.map(({ x, y }) => ({
-          x,
-          y: mix(height, 0, y) - height * 0.5
-        }));
+      ctx.save();
+      ctx.globalAlpha = 0.5;
+      ctx.fillStyle = "#fff";
+      ctx.fillRect(
+        highlightstart,
+        SCROLL_BAR_OFFSET_Y - SCROLL_BAR_HEIGHT * 0.5,
+        highlightWidth,
+        SCROLL_BAR_HEIGHT
+      );
+      ctx.restore();
 
-        ctx.save();
-        ctx.translate(0, offsetY);
+      const scaledPoints = points.map(({ x, y }) => ({
+        x,
+        y: mix(GRAPH_HEIGHT, 0, y) - GRAPH_HEIGHT * 0.5
+      }));
 
-        ctx.save();
-        ctx.fillStyle = "#008";
-        ctx.fillRect(
-          rangeStart,
-          -height * 0.5 - HIGHLIGHT_PADDING,
-          rangeWidth,
-          height + HIGHLIGHT_PADDING * 2
-        );
-        ctx.restore();
+      ctx.save();
+      ctx.translate(0, GRAPH_OFFSET_Y);
 
-        ctx.save();
-        ctx.globalAlpha = 0.3;
-        ctx.beginPath();
-        yAxises
-          .map(v =>
-            mix(
-              height / 2,
-              -height / 2,
-              minCount === maxCount
-                ? 0.5
-                : (v - minCount) / (maxCount - minCount)
-            )
+      ctx.save();
+      ctx.globalAlpha = 0.3;
+      ctx.beginPath();
+      yAxises
+        .map(v =>
+          mix(
+            GRAPH_HEIGHT / 2,
+            -GRAPH_HEIGHT / 2,
+            minCount === maxCount ? 0.5 : (v - minCount) / (maxCount - minCount)
           )
-          .forEach(y => {
-            ctx.moveTo(-vw / 2, y);
-            ctx.lineTo(vw / 2, y);
-          });
+        )
+        .forEach(y => {
+          ctx.moveTo(-vw / 2, y);
+          ctx.lineTo(vw / 2, y);
+        });
+      ctx.stroke();
+      ctx.restore();
+
+      if (scaledPoints.length > 1) {
+        ctx.beginPath();
+        scaledPoints.forEach(({ x, y }, i) => {
+          if (i) {
+            ctx.lineTo(x, y);
+          } else {
+            ctx.moveTo(x, y);
+          }
+        });
         ctx.stroke();
-        ctx.restore();
 
-        if (scaledPoints.length > 1) {
-          ctx.beginPath();
-          scaledPoints.forEach(({ x, y }, i) => {
-            if (i) {
-              ctx.lineTo(x, y);
-            } else {
-              ctx.moveTo(x, y);
-            }
-          });
-          ctx.stroke();
-
-          scaledPoints.forEach(({ x, y }, i) => {
-            const isEdge = i === 0 || i === this.list.length - 1;
-            const isFocus = i === focusIndex;
-            const isEntrySpot = this.entryIndexes.includes(i);
-            if (isFocus || isEdge || isEntrySpot) {
-              ctx.save();
-              ctx.fillStyle = isFocus ? "#fff" : "#003";
-              if (isEntrySpot) {
-                ctx.fillStyle = "#0f0";
-              }
-              const dotSize = isFocus || !isEntrySpot ? DOT_SIZE : DOT_SIZE / 2;
-              ctx.beginPath();
-              ctx.arc(x, y, dotSize, 0, Math.PI * 2);
-              ctx.fill();
-              if (isEdge) {
-                ctx.stroke();
-              }
-              ctx.restore();
-            }
-          });
-        }
-        ctx.restore();
-      });
+        scaledPoints.forEach(({ x, y }, i) => {
+          const isEdge = i === 0 || i === this.list.length - 1;
+          const isFocus = i === focusIndex;
+          const isEntrySpot = this.entryIndexes.includes(i);
+          if (isFocus) {
+            ctx.save();
+            ctx.fillStyle = "#fff";
+            ctx.beginPath();
+            ctx.arc(x, y, DOT_SIZE * 0.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.globalAlpha = 0.5;
+            ctx.moveTo(x, -vh / 2 - GRAPH_OFFSET_Y);
+            ctx.lineTo(x, vh / 2 - GRAPH_OFFSET_Y);
+            ctx.stroke();
+            ctx.restore();
+          }
+          if (isEdge) {
+            ctx.save();
+            ctx.fillStyle = "#003";
+            ctx.beginPath();
+            ctx.arc(x, y, DOT_SIZE, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+            ctx.restore();
+          }
+          if (isEntrySpot) {
+            const markWidth = 8;
+            const markHeight = 6;
+            const yOffset = -8;
+            ctx.save();
+            ctx.fillStyle = "#fff";
+            ctx.beginPath();
+            ctx.moveTo(x, y + yOffset);
+            ctx.lineTo(x - markWidth / 2, y - markHeight + yOffset);
+            ctx.lineTo(x + markWidth / 2, y - markHeight + yOffset);
+            ctx.lineTo(x, y + yOffset);
+            ctx.fill();
+            ctx.restore();
+          }
+        });
+      }
+      ctx.restore();
     }
     ctx.restore();
   }
