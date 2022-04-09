@@ -95,7 +95,7 @@ const mainStyle = css({
     borderColor: `transparent transparent ${THEME_HIGHLIGHT} transparent`
   },
   [MQ_MOBILE]: {
-    height: spp(650),
+    height: spp(700),
     "&:before": {
       borderWidth: spp(0, 50, 50, 50),
       marginLeft: spp(-50)

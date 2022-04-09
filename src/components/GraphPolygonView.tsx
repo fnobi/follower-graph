@@ -26,7 +26,7 @@ const canvasStyle = css({
   },
   [MQ_MOBILE]: {
     top: spp(400),
-    bottom: spp(650)
+    bottom: spp(700)
   },
   [MQ_DESKTOP]: {
     top: pcp(400),
