@@ -70,7 +70,7 @@ const GraphPolygonView: FC<{
       els: [wrapper],
       onMove: ({ x, y }) => {
         scrollBy(x * 0.02);
-        setGraphZoom(z => z - y * 0.01);
+        setGraphZoom(z => z + y * 0.01);
       },
       wheelHandler: (e: WheelEvent) => ({
         x: -e.deltaX * 0.3,

@@ -222,7 +222,7 @@ const DataLogScene: FC<{ twitterId: string; onBack?: () => void }> = ({
     setScroll(s => clamp(0, list ? list.length : 0, fn(s)));
   };
   const handleGraphZoom = (fn: (z: number) => number) => {
-    setGraphZoom(s => clamp(-13, 13, fn(s)));
+    setGraphZoom(s => clamp(-9, 13, fn(s)));
   };
 
   const unfollowAccount = async () => {
