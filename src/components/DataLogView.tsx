@@ -38,6 +38,19 @@ const GraphPolygonView = dynamic(
   { ssr: false }
 );
 
+const centerLineStyle = css({
+  position: "fixed",
+  left: percent(50),
+  bottom: percent(0),
+  borderRight: `solid ${px(1)} #00f`,
+  [MQ_MOBILE]: {
+    top: spp(200)
+  },
+  [MQ_DESKTOP]: {
+    top: pcp(200)
+  }
+});
+
 const headerStyle = css({
   position: "fixed",
   top: em(1),
@@ -64,10 +77,9 @@ const profileViewStyle = css({
 
 const mainStyle = css({
   position: "absolute",
-  top: percent(50),
   bottom: percent(0),
   width: percent(100),
-  background: "#000",
+  background: "#00f",
   "&:before": {
     content: "''",
     display: "block",
@@ -75,15 +87,17 @@ const mainStyle = css({
     left: percent(50),
     bottom: percent(100),
     borderStyle: "solid",
-    borderColor: "transparent transparent black transparent"
+    borderColor: "transparent transparent #00f transparent"
   },
   [MQ_MOBILE]: {
+    height: spp(650),
     "&:before": {
       borderWidth: spp(0, 50, 50, 50),
       marginLeft: spp(-50)
     }
   },
   [MQ_DESKTOP]: {
+    height: pcp(650),
     "&:before": {
       borderWidth: pcp(0, 50, 50, 50),
       marginLeft: pcp(-50)
@@ -227,6 +241,7 @@ const DataLogView = (props: { twitterId: string; onBack?: () => void }) => {
 
   return (
     <div>
+      <div css={centerLineStyle} />
       <GraphPolygonView
         list={list}
         entryIndexes={tweetEntries.map(t => t.index)}

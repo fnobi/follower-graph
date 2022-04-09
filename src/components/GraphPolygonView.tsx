@@ -1,8 +1,9 @@
 import { useEffect, useRef } from "react";
 import { css } from "@emotion/react";
-import { percent } from "~/lib/cssUtil";
+import { pcp, percent, spp } from "~/lib/cssUtil";
 import useCanvasAgent from "~/lib/useCanvasAgent";
 import Dragger from "~/lib/Dragger";
+import { MQ_DESKTOP, MQ_MOBILE } from "~/lib/MQ";
 import GraphPolygonPlayer from "~/local/GraphPolygonPlayer";
 import { TwitterData } from "~/scheme/TwitterData";
 
@@ -11,16 +12,22 @@ export const calcFocusIndex = (list: TwitterData[], scroll: number) =>
 
 const canvasStyle = css({
   position: "fixed",
-  top: percent(0),
   left: percent(0),
   width: percent(100),
-  height: percent(100),
   canvas: {
     position: "absolute",
     top: percent(0),
     left: percent(0),
     width: percent(100),
     height: percent(100)
+  },
+  [MQ_MOBILE]: {
+    top: spp(400),
+    bottom: spp(650)
+  },
+  [MQ_DESKTOP]: {
+    top: pcp(400),
+    bottom: pcp(650)
   }
 });
 

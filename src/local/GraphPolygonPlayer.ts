@@ -5,11 +5,7 @@ import { calcFocusIndex } from "~/components/GraphPolygonView";
 
 const VIEWPORT = 450;
 const DOT_SIZE = 4;
-const GRAPH_HEIGHT = 160;
-const GRAPH_UNIT = 10;
-const GRAPH_OFFSET_Y = -100;
-const SCROLL_BAR_OFFSET_Y = -200;
-const SCROLL_BAR_HEIGHT = 4;
+const GRAPH_PADDING = 20;
 
 const calcYUnit = (diff: number) => {
   let p = 3;
@@ -71,15 +67,14 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
         this.list,
         item => item.followersCount
       );
-      const scrollLength = (this.list.length - 1) * GRAPH_UNIT;
-      const scrollOffset = scrollLength * scroll;
+
       const vw = canvas.width / this.scale;
       const vh = canvas.height / this.scale;
-      const cc = this.list.length - 1;
-      const mc = this.list.length + 1;
-      const staticGraphRight = (0.5 - 1 / mc) * vw;
-      const staticGraphLength = (vw / mc) * cc;
-      const highlightWidth = (staticGraphLength * vw) / scrollLength;
+      const graphHeight = vh - GRAPH_PADDING * 2;
+      const graphUnit = graphHeight / 30;
+
+      const scrollLength = (this.list.length - 1) * graphUnit;
+      const scrollOffset = scrollLength * scroll;
       const yUnit = calcYUnit(maxCount - minCount);
       const yAxisStart = Math.ceil(minCount / yUnit) * yUnit;
       const yLineCount = Math.ceil((maxCount - yAxisStart) / yUnit);
@@ -91,31 +86,15 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
         minCount === maxCount ? 0.5 : (count - minCount) / (maxCount - minCount)
       );
       const points = ys.map((y, i) => ({
-        x: -i * GRAPH_UNIT + scrollOffset,
+        x: -i * graphUnit + scrollOffset,
         y
       }));
       const focusIndex = calcFocusIndex(this.list, scroll);
-      const highlightstart =
-        staticGraphRight - staticGraphLength * scroll - highlightWidth / 2;
-
-      ctx.save();
-      ctx.globalAlpha = 0.5;
-      ctx.fillStyle = "#fff";
-      ctx.fillRect(
-        highlightstart,
-        SCROLL_BAR_OFFSET_Y - SCROLL_BAR_HEIGHT * 0.5,
-        highlightWidth,
-        SCROLL_BAR_HEIGHT
-      );
-      ctx.restore();
 
       const scaledPoints = points.map(({ x, y }) => ({
         x,
-        y: mix(GRAPH_HEIGHT, 0, y) - GRAPH_HEIGHT * 0.5
+        y: mix(graphHeight, 0, y) - graphHeight * 0.5
       }));
-
-      ctx.save();
-      ctx.translate(0, GRAPH_OFFSET_Y);
 
       ctx.save();
       ctx.globalAlpha = 0.3;
@@ -123,8 +102,8 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
       yAxises
         .map(v =>
           mix(
-            GRAPH_HEIGHT / 2,
-            -GRAPH_HEIGHT / 2,
+            graphHeight / 2,
+            -graphHeight / 2,
             minCount === maxCount ? 0.5 : (v - minCount) / (maxCount - minCount)
           )
         )
@@ -141,13 +120,9 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
           if (isFocus) {
             ctx.save();
             ctx.fillStyle = "#fff";
-            ctx.strokeStyle = "#00f";
             ctx.beginPath();
             ctx.arc(x, y, DOT_SIZE * 0.5, 0, Math.PI * 2);
             ctx.fill();
-            ctx.moveTo(x, -vh / 2 - GRAPH_OFFSET_Y);
-            ctx.lineTo(x, vh / 2 - GRAPH_OFFSET_Y);
-            ctx.stroke();
             ctx.restore();
           }
         });
@@ -189,7 +164,6 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
           }
         });
       }
-      ctx.restore();
     }
     ctx.restore();
   }

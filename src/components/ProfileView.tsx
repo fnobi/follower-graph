@@ -1,6 +1,6 @@
 import { css } from "@emotion/react";
 import { FC } from "react";
-import { pcp, spp } from "~/lib/cssUtil";
+import { em, pcp, px, spp } from "~/lib/cssUtil";
 import { MQ_DESKTOP, MQ_MOBILE } from "~/lib/MQ";
 import { CUSTOM_FONT_FAMILY } from "~/local/commonCss";
 import useAccountIcon from "~/local/useAccountIcon";
@@ -11,11 +11,26 @@ const wrapperStyle = css({
   justifyContent: "center",
   alignItems: "center",
   fontFamily: CUSTOM_FONT_FAMILY,
+  lineHeight: 1,
   [MQ_MOBILE]: {
     fontSize: spp(30)
   },
   [MQ_DESKTOP]: {
     fontSize: pcp(30)
+  }
+});
+
+const contentStyle = css({
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  backgroundColor: "#000",
+  border: `solid ${px(1)} rgba(255,255,255,0.2)`,
+  [MQ_MOBILE]: {
+    padding: spp(15)
+  },
+  [MQ_DESKTOP]: {
+    padding: pcp(15)
   }
 });
 
@@ -36,6 +51,7 @@ const iconStyle = css({
 });
 
 const idStyle = css({
+  marginBottom: em(0.2),
   [MQ_MOBILE]: {
     fontSize: spp(50)
   },
@@ -51,10 +67,12 @@ const ProfileView: FC<{ name: string; account: TwitterAccount }> = ({
   const style = useAccountIcon(account);
   return (
     <div css={wrapperStyle}>
-      <div css={iconStyle} style={style} />
-      <div>
-        <div css={idStyle}>@{name}</div>
-        <div>{account.name}</div>
+      <div css={contentStyle}>
+        <div css={iconStyle} style={style} />
+        <div>
+          <div css={idStyle}>@{name}</div>
+          <div>{account.name}</div>
+        </div>
       </div>
     </div>
   );
