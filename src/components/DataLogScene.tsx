@@ -81,6 +81,10 @@ const mainStyle = css({
   width: percent(100),
   background: THEME_HIGHLIGHT,
   color: THEME_BG,
+  display: "flex",
+  justifyContent: "flex-start",
+  alignItems: "center",
+  flexDirection: "column",
   "&:before": {
     content: "''",
     display: "block",
@@ -125,14 +129,7 @@ const statsViewStyle = css({
   }
 });
 
-const entryViewStyle = css({
-  [MQ_MOBILE]: {
-    margin: spp(0, 50)
-  },
-  [MQ_DESKTOP]: {
-    margin: pcp(0, 50)
-  }
-});
+const entryViewStyle = css({});
 
 const filterSelectStyle = css(buttonReset, commonShadowStyle, {
   backgroundColor: THEME_BUTTON,

@@ -18,11 +18,13 @@ const wrapperStyle = css({
   textDecoration: "none",
   [MQ_MOBILE]: {
     padding: spp(20),
-    fontSize: spp(30)
+    fontSize: spp(30),
+    width: spp(980)
   },
   [MQ_DESKTOP]: {
     padding: pcp(20),
-    fontSize: pcp(30)
+    fontSize: pcp(30),
+    width: pcp(1500)
   }
 });
 
