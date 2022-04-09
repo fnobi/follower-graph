@@ -80,7 +80,7 @@ const GraphPolygonView: FC<{
           lockDir = "y";
         }
         if (lockDir !== "y") {
-          scrollBy(x * 0.02);
+          scrollBy(x * 0.04);
         }
         if (lockDir !== "x") {
           setGraphZoom(z => z + y * 0.001);
@@ -91,7 +91,7 @@ const GraphPolygonView: FC<{
         }, 100);
       },
       wheelHandler: (e: WheelEvent) => ({
-        x: -e.deltaX * 0.3,
+        x: -e.deltaX * 0.2,
         y: -e.deltaY * 0.3,
         z: 0
       }),
