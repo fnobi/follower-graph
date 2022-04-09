@@ -59,7 +59,7 @@ const GraphPolygonView = (props: {
     const dragger = new Dragger({
       els: [wrapper],
       onMove: ({ x, y }) => {
-        scrollBy((-y + x) * 0.0002);
+        scrollBy((-y + x) * 0.02);
       },
       wheelHandler: (e: WheelEvent) => ({
         x: 0,

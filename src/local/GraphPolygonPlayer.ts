@@ -57,7 +57,7 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
   }
 
   private render() {
-    const { ctx, canvas, scroll } = this;
+    const { ctx, canvas } = this;
     if (!ctx || !canvas) {
       return;
     }
@@ -69,6 +69,7 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
     ctx.strokeStyle = "#fff";
 
     if (this.list.length) {
+      const scroll = this.scroll / this.list.length;
       const { followersCount: minCount } = minBy(
         this.list,
         item => item.followersCount
@@ -177,7 +178,7 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
           if (isFocus) {
             ctx.save();
             ctx.fillStyle = "#fff";
-            if (isEdge) {
+            if (isEdge && !isEntrySpot) {
               const size = EDGE_DOT_SIZE - 4;
               ctx.fillRect(x - size * 0.5, y - size * 0.5, size, size);
             } else {

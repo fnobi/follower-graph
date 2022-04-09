@@ -199,8 +199,8 @@ const DataLogView = (props: { twitterId: string; onBack?: () => void }) => {
     if (!list) {
       return 0;
     }
-    return calcFocusIndex(list, scroll);
-  }, [scroll]);
+    return calcFocusIndex(list, scroll / list.length);
+  }, [scroll, list]);
 
   const focusItem = useMemo(() => (list ? list[focusIndex] || null : null), [
     list,
@@ -216,7 +216,7 @@ const DataLogView = (props: { twitterId: string; onBack?: () => void }) => {
   }, [focusItem]);
 
   const handleScroll = (fn: (s: number) => number) => {
-    setScroll(s => clamp(0, 1, fn(s)));
+    setScroll(s => clamp(0, list ? list.length : 0, fn(s)));
   };
 
   const unfollowAccount = async () => {
@@ -255,6 +255,10 @@ const DataLogView = (props: { twitterId: string; onBack?: () => void }) => {
       }
     );
   }, [twitterId, filter]);
+
+  useEffect(() => {
+    setScroll(0);
+  }, [list]);
 
   if (!list) {
     return <LoadingView />;
