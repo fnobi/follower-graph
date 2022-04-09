@@ -73,28 +73,6 @@ async function writeTwitterLogData(
   };
 }
 
-exports.scheduleMigrateUsersTask = functions.pubsub
-    .schedule("every 5 minutes")
-    .onRun(async () => {
-      const rootRef = admin.firestore().collection("users");
-      const users = await rootRef.get();
-      await Promise.all(users.docs.map(async (userSnapshot) =>{
-        const logRef = userSnapshot.ref.collection("log");
-        const logs = await logRef.limit(10).get();
-        const { twitter } = userSnapshot.data();
-        const targetRef = twitterLogCollectionRef(twitter);
-        await Promise.all(logs.docs.map(async (logSnapshot) => {
-          const d = logSnapshot.data();
-          console.log(twitter, targetRef.path, JSON.stringify(d));
-          await Promise.all([
-            targetRef.doc().set(d),
-            logSnapshot.ref.delete()
-          ]);
-        }));
-      }
-      ));
-    });
-
 exports.scheduleFetchTwitterFollowers = functions.pubsub
     .schedule("every 1 hours")
     .onRun(async () => {
