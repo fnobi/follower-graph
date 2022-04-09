@@ -1,8 +1,7 @@
 import { css } from "@emotion/react";
 import dynamic from "next/dynamic";
 import { useState, useEffect, useMemo } from "react";
-import { em, percent, px } from "~/lib/cssUtil";
-import { signOut } from "firebase/auth";
+import { em, pcp, percent, px, spp } from "~/lib/cssUtil";
 import {
   deleteDoc,
   limit,
@@ -14,13 +13,17 @@ import {
 } from "firebase/firestore";
 import { useRouter } from "next/router";
 import { clamp, flatten, padLeft, sortBy, uniq } from "~/lib/lodashLike";
+import { MQ_DESKTOP, MQ_MOBILE } from "~/lib/MQ";
 import {
   profileFollowDocumentRef,
   twitterDocumentRef,
   twitterLogCollectionRef
 } from "~/local/database";
-import { buttonLinkStyle, buttonReset } from "~/local/commonCss";
-import { firebaseAuth } from "~/local/firebaseApp";
+import {
+  buttonLinkStyle,
+  buttonReset,
+  CUSTOM_FONT_FAMILY
+} from "~/local/commonCss";
 import { useMeStore } from "~/local/useMeStore";
 import { parseTwitterData, TwitterData } from "~/scheme/TwitterData";
 import { parseTwitterAccount, TwitterAccount } from "~/scheme/TwitterAccount";
@@ -37,24 +40,59 @@ const GraphPolygonView = dynamic(
 const headerStyle = css({
   position: "fixed",
   top: em(1),
-  left: em(1)
-});
-
-const footerStyle = css({
-  position: "fixed",
-  bottom: em(1),
-  right: em(1)
+  left: em(1),
+  right: em(1),
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center"
 });
 
 const profileViewStyle = css({
   position: "absolute",
-  top: em(1),
-  right: em(1)
+  width: percent(100),
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  [MQ_MOBILE]: {
+    top: spp(200)
+  },
+  [MQ_DESKTOP]: {
+    top: pcp(200)
+  }
 });
 
 const entryInfoStyle = css({
   position: "absolute",
-  top: percent(50)
+  top: percent(50),
+  width: percent(100)
+});
+
+const statsViewStyle = css({
+  fontFamily: CUSTOM_FONT_FAMILY,
+  textAlign: "center",
+  lineHeight: 1,
+  strong: {
+    display: "block",
+    fontWeight: "bold",
+    fontSize: percent(200)
+  },
+  [MQ_MOBILE]: {
+    margin: spp(50, 0),
+    fontSize: spp(70)
+  },
+  [MQ_DESKTOP]: {
+    margin: pcp(50, 0),
+    fontSize: pcp(70)
+  }
+});
+
+const bottomStyle = css({
+  [MQ_MOBILE]: {
+    margin: spp(0, 50)
+  },
+  [MQ_DESKTOP]: {
+    margin: pcp(0, 50)
+  }
 });
 
 const filterSelectStyle = css(buttonReset, {
@@ -127,10 +165,6 @@ const DataLogView = (props: { twitterId: string; onBack?: () => void }) => {
     setScroll(s => clamp(0, 1, fn(s)));
   };
 
-  const handleLogout = () => {
-    signOut(firebaseAuth());
-  };
-
   const unfollowAccount = async () => {
     if (!user || !user.id) {
       return;
@@ -187,28 +221,29 @@ const DataLogView = (props: { twitterId: string; onBack?: () => void }) => {
       ) : null}
       <div css={entryInfoStyle}>
         {focusItem ? (
-          <div>
-            {focusItem.followersCount.toLocaleString()}
-            <br />
+          <div css={statsViewStyle}>
+            <strong>{focusItem.followersCount.toLocaleString()}</strong>
             {dateString}
           </div>
         ) : null}
-        {tweetEntries.length ? (
-          <EntryView
-            focusIndex={focusIndex}
-            tweetEntries={tweetEntries}
-            name={twitterId}
-          />
-        ) : null}
+        <div css={bottomStyle}>
+          {tweetEntries.length ? (
+            <EntryView
+              focusIndex={focusIndex}
+              tweetEntries={tweetEntries}
+              name={twitterId}
+            />
+          ) : null}
+        </div>
       </div>
       <div css={headerStyle}>
-        <button type="button" css={buttonLinkStyle} onClick={onBack}>
-          &lt;back
-        </button>
-      </div>
-      <div css={footerStyle}>
+        <div style={{ flexGrow: 1, width: "100%" }}>
+          <button type="button" css={buttonLinkStyle} onClick={onBack}>
+            &lt;
+          </button>
+        </div>
         {twitterId ? (
-          <>
+          <div style={{ display: "flex" }}>
             <select
               value={filter}
               onChange={e => {
@@ -236,11 +271,8 @@ const DataLogView = (props: { twitterId: string; onBack?: () => void }) => {
               unfollow
             </button>
             &nbsp;
-          </>
+          </div>
         ) : null}
-        <button type="button" onClick={handleLogout} css={buttonLinkStyle}>
-          logout
-        </button>
       </div>
     </div>
   );

@@ -1,13 +1,14 @@
 import { css } from "@emotion/react";
 import { onSnapshot } from "firebase/firestore";
 import { FC, useEffect, useMemo, useState } from "react";
-import { em, percent, px } from "~/lib/cssUtil";
+import { em, pcp, percent, px, spp } from "~/lib/cssUtil";
 import { padLeft } from "~/lib/lodashLike";
+import { MQ_DESKTOP, MQ_MOBILE } from "~/lib/MQ";
 import { twitterEntryDocumentRef } from "~/local/database";
 import { parseTwitterEntry, TwitterEntry } from "~/scheme/TwitterEntry";
 
 const wrapperStyle = css({
-  "--focusColor": "#0f0",
+  "--focusColor": "#fff",
   display: "block",
   backgroundColor: "#333",
   color: "var(--focusColor)",
@@ -16,7 +17,9 @@ const wrapperStyle = css({
   a: {
     color: "inherit",
     textDecoration: "none"
-  }
+  },
+  [MQ_MOBILE]: { fontSize: spp(30) },
+  [MQ_DESKTOP]: { fontSize: pcp(30) }
 });
 
 const mainTextStyle = css({});
