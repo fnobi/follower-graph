@@ -1,5 +1,5 @@
 const SP_VIEWPORT_SIZE = 1125;
-const PC_VIEWPORT_SIZE = 3840;
+const PC_VIEWPORT_SIZE = 2500;
 
 const appendPostfix = (nums: number[], postfix: string) => {
   return nums.map<string>(n => `${n}${postfix}`).join(" ");
@@ -26,7 +26,7 @@ export const vh = (...nums: number[]) => {
 };
 
 export const pcp = (...nums: number[]) => {
-  return vw(...nums.map(n => (n / PC_VIEWPORT_SIZE) * 100));
+  return vh(...nums.map(n => (n / PC_VIEWPORT_SIZE) * 100));
 };
 
 export const spp = (...nums: number[]) => {
