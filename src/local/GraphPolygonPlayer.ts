@@ -55,12 +55,10 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
 
   public setGraphZoom(z: number) {
     this.graphZoom = z;
-    this.render();
   }
 
   public setScroll(num: number) {
     this.scroll = num;
-    this.render();
   }
 
   private render() {
@@ -201,8 +199,9 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
     ctx.restore();
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  public update() {}
+  public update() {
+    this.render();
+  }
 
   public resize() {
     const { canvas } = this;
