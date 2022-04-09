@@ -66,11 +66,29 @@ const GraphPolygonView: FC<{
     if (!wrapper) {
       return () => {};
     }
+
+    let lockDir: "x" | "y" | null = null;
+    let lockTimer = -1;
+    const POW = 3;
+
     const dragger = new Dragger({
       els: [wrapper],
       onMove: ({ x, y }) => {
-        scrollBy(x * 0.02);
-        setGraphZoom(z => z + y * 0.01);
+        if (Math.abs(x) > Math.abs(y) * POW) {
+          lockDir = "x";
+        } else if (Math.abs(y) > Math.abs(x) * POW) {
+          lockDir = "y";
+        }
+        if (lockDir !== "y") {
+          scrollBy(x * 0.02);
+        }
+        if (lockDir !== "x") {
+          setGraphZoom(z => z + y * 0.01);
+        }
+        window.clearTimeout(lockTimer);
+        lockTimer = window.setTimeout(() => {
+          lockDir = null;
+        }, 100);
       },
       wheelHandler: (e: WheelEvent) => ({
         x: -e.deltaX * 0.3,
@@ -79,7 +97,10 @@ const GraphPolygonView: FC<{
       }),
       preventDefault: true
     });
-    return () => dragger.destroy();
+    return () => {
+      dragger.destroy();
+      window.clearTimeout(lockTimer);
+    };
   }, []);
 
   useEffect(() => {
