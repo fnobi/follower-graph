@@ -15,10 +15,7 @@ const wrapperStyle = css({
   color: "var(--focusColor)",
   border: `solid ${px(1)} rgba(255,255,255,0.2)`,
   padding: em(0.8),
-  a: {
-    color: "inherit",
-    textDecoration: "none"
-  },
+  textDecoration: "none",
   [MQ_MOBILE]: {
     padding: spp(20),
     fontSize: spp(30)
@@ -71,21 +68,15 @@ const EntryView: FC<{
     });
   }, [id]);
 
-  if (!entry) {
+  if (!entry || !href) {
     return null;
   }
 
   return (
-    <div css={wrapperStyle}>
-      <>
-        <div css={mainTextStyle}>{entry.text}</div>
-        {href ? (
-          <a href={href} target="_blank" rel="noopener noreferrer">
-            <div css={dateStyle}>{date}</div>
-          </a>
-        ) : null}
-      </>
-    </div>
+    <a css={wrapperStyle} href={href} target="_blank" rel="noopener noreferrer">
+      <div css={mainTextStyle}>{entry.text}</div>
+      <div css={dateStyle}>{date}</div>
+    </a>
   );
 };
 
