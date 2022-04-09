@@ -38,8 +38,6 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
 
   private entryIndexes: number[] = [];
 
-  private twitterName: string = "";
-
   public constructor() {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
@@ -49,10 +47,6 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
 
   public setList(list: TwitterData[]) {
     this.list = list;
-  }
-
-  public setTwitterName(twitterName: string) {
-    this.twitterName = twitterName;
   }
 
   public setEntryIndexes(is: number[]) {
@@ -218,9 +212,6 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
 
         ctx.font = makeFont(FONT_SIZE * 0.5);
         ctx.fillText(dateString, 0, FONT_SIZE * 1);
-        if (this.twitterName) {
-          ctx.fillText(`@${this.twitterName}`, 0, -FONT_SIZE * 1.1);
-        }
         ctx.restore();
       }
     }

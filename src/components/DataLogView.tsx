@@ -16,12 +16,15 @@ import { useRouter } from "next/router";
 import { clamp, flatten, sortBy, uniq } from "~/lib/lodashLike";
 import {
   profileFollowDocumentRef,
+  twitterDocumentRef,
   twitterLogCollectionRef
 } from "~/local/database";
 import { buttonLinkStyle, buttonReset } from "~/local/commonCss";
 import { firebaseAuth } from "~/local/firebaseApp";
 import { useMeStore } from "~/local/useMeStore";
 import { parseTwitterData, TwitterData } from "~/scheme/TwitterData";
+import { parseTwitterAccount, TwitterAccount } from "~/scheme/TwitterAccount";
+import ProfileView from "~/components/ProfileView";
 import EntryView from "~/components/EntryView";
 import LoadingView from "~/components/LoadingView";
 import { calcFocusIndex } from "~/components/GraphPolygonView";
@@ -40,6 +43,12 @@ const headerStyle = css({
 const footerStyle = css({
   position: "fixed",
   bottom: em(1),
+  right: em(1)
+});
+
+const profileViewStyle = css({
+  position: "absolute",
+  top: em(1),
   right: em(1)
 });
 
@@ -63,6 +72,7 @@ const DataLogView = (props: { twitterId: string; onBack?: () => void }) => {
   const router = useRouter();
   const { user } = useMeStore();
   const [list, setList] = useState<TwitterData[] | null>(null);
+  const [account, setAccount] = useState<TwitterAccount | null>(null);
   const [filter, setFilter] = useState<"hours" | "days" | "monthes">("hours");
   const [scroll, setScroll] = useState(0);
 
@@ -114,6 +124,15 @@ const DataLogView = (props: { twitterId: string; onBack?: () => void }) => {
   };
 
   useEffect(() => {
+    if (!twitterId) {
+      return () => {};
+    }
+    return onSnapshot(twitterDocumentRef(twitterId), d =>
+      setAccount(parseTwitterAccount(d.data()))
+    );
+  }, [twitterId]);
+
+  useEffect(() => {
     setList(null);
     const ref = twitterLogCollectionRef(twitterId);
     const queryConstants: QueryConstraint[] = [];
@@ -141,11 +160,15 @@ const DataLogView = (props: { twitterId: string; onBack?: () => void }) => {
     <div>
       <GraphPolygonView
         list={list}
-        twitterName={twitterId}
         entryIndexes={tweetEntries.map(t => t.index)}
         scroll={scroll}
         onScroll={handleScroll}
       />
+      {account ? (
+        <div css={profileViewStyle}>
+          <ProfileView name={twitterId} account={account} />
+        </div>
+      ) : null}
       {tweetEntries.length ? (
         <div css={entryInfoStyle}>
           <EntryView

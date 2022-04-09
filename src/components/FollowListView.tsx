@@ -14,6 +14,7 @@ import {
 import { buttonLinkStyle, CUSTOM_FONT_FAMILY } from "~/local/commonCss";
 import { useMeStore } from "~/local/useMeStore";
 import { firebaseAuth } from "~/local/firebaseApp";
+import useAccountIcon from "~/local/useAccountIcon";
 import { parseTwitterAccount, TwitterAccount } from "~/scheme/TwitterAccount";
 
 const wrapperStyle = css({
@@ -127,15 +128,8 @@ const AccountCell = (props: { id: string }) => {
   );
 
   const href = useMemo(() => `/?${stringify({ id })}`, [id]);
-  const iconUrl = useMemo(() => {
-    if (!twitterAccount) {
-      return [];
-    }
-    return [
-      twitterAccount.iconUrl.replace(/_normal(\.(png|jpe?g|gif))$/, "$1"),
-      twitterAccount.iconUrl
-    ];
-  }, [twitterAccount]);
+
+  const twitterAccountIconStyle = useAccountIcon(twitterAccount);
 
   useEffect(() => {
     if (!id) {
@@ -149,14 +143,7 @@ const AccountCell = (props: { id: string }) => {
   return (
     <Link href={href}>
       <a href={href} css={accountCellStyle}>
-        <div
-          css={cellIconStyle}
-          style={{
-            backgroundImage: iconUrl.length
-              ? iconUrl.map(u => `url(${u})`).join(",")
-              : "none"
-          }}
-        />
+        <div css={cellIconStyle} style={twitterAccountIconStyle} />
         <div css={cellTextStyle}>
           <strong>@{id}</strong>
           {twitterAccount ? twitterAccount.name : null}
