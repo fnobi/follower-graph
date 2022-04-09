@@ -61,10 +61,33 @@ const profileViewStyle = css({
   }
 });
 
-const entryInfoStyle = css({
+const mainStyle = css({
   position: "absolute",
   top: percent(50),
-  width: percent(100)
+  bottom: percent(0),
+  width: percent(100),
+  background: "#000",
+  "&:before": {
+    content: "''",
+    display: "block",
+    position: "absolute",
+    left: percent(50),
+    bottom: percent(100),
+    borderStyle: "solid",
+    borderColor: "transparent transparent black transparent"
+  },
+  [MQ_MOBILE]: {
+    "&:before": {
+      borderWidth: spp(0, 50, 50, 50),
+      marginLeft: spp(-50)
+    }
+  },
+  [MQ_DESKTOP]: {
+    "&:before": {
+      borderWidth: pcp(0, 50, 50, 50),
+      marginLeft: pcp(-50)
+    }
+  }
 });
 
 const statsViewStyle = css({
@@ -86,7 +109,7 @@ const statsViewStyle = css({
   }
 });
 
-const bottomStyle = css({
+const entryViewStyle = css({
   [MQ_MOBILE]: {
     margin: spp(0, 50)
   },
@@ -219,14 +242,14 @@ const DataLogView = (props: { twitterId: string; onBack?: () => void }) => {
           <ProfileView name={twitterId} account={account} />
         </div>
       ) : null}
-      <div css={entryInfoStyle}>
+      <div css={mainStyle}>
         {focusItem ? (
           <div css={statsViewStyle}>
             <strong>{focusItem.followersCount.toLocaleString()}</strong>
             {dateString}
           </div>
         ) : null}
-        <div css={bottomStyle}>
+        <div css={entryViewStyle}>
           {tweetEntries.length ? (
             <EntryView
               focusIndex={focusIndex}

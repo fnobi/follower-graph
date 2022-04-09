@@ -10,10 +10,10 @@ import { parseTwitterEntry, TwitterEntry } from "~/scheme/TwitterEntry";
 const wrapperStyle = css({
   "--focusColor": "#fff",
   display: "block",
-  backgroundColor: "#333",
+  backgroundColor: "#003",
   color: "var(--focusColor)",
-  border: `solid ${px(1)} var(--focusColor)`,
-  padding: em(0.5),
+  border: `solid ${px(1)} rgba(255,255,255,0.2)`,
+  padding: em(0.8),
   a: {
     color: "inherit",
     textDecoration: "none"
