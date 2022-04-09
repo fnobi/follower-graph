@@ -26,6 +26,8 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
 
   private scale = 0;
 
+  private graphZoom = 0;
+
   private list: TwitterData[] = [];
 
   private entryIndexes: number[] = [];
@@ -49,6 +51,11 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
 
   public setAxisIndexes(is: number[]) {
     this.axisIndexes = [...is];
+  }
+
+  public setGraphZoom(z: number) {
+    this.graphZoom = z;
+    this.render();
   }
 
   public setScroll(num: number) {
@@ -82,7 +89,7 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
       const vw = canvas.width / this.scale;
       const vh = canvas.height / this.scale;
       const graphHeight = vh - GRAPH_PADDING * 2;
-      const graphUnit = graphHeight / 30;
+      const graphUnit = Math.max(0, graphHeight / 30 + this.graphZoom);
 
       const scrollLength = (this.list.length - 1) * graphUnit;
       const scrollOffset = scrollLength * scroll;

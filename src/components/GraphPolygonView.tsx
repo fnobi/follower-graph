@@ -38,9 +38,19 @@ const GraphPolygonView: FC<{
   list: TwitterData[];
   entryIndexes: number[];
   axisIndexes: number[];
+  graphZoom: number;
+  setGraphZoom: (fn: (z: number) => number) => void;
   scroll: number;
   onScroll: (fn: (s: number) => number) => void;
-}> = ({ list, entryIndexes, axisIndexes, scroll, onScroll }) => {
+}> = ({
+  list,
+  entryIndexes,
+  axisIndexes,
+  graphZoom,
+  setGraphZoom,
+  scroll,
+  onScroll
+}) => {
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const { playerRef } = useCanvasAgent({
     initializer: () => new GraphPolygonPlayer(),
@@ -59,11 +69,12 @@ const GraphPolygonView: FC<{
     const dragger = new Dragger({
       els: [wrapper],
       onMove: ({ x, y }) => {
-        scrollBy((-y + x) * 0.02);
+        scrollBy(x * 0.02);
+        setGraphZoom(z => z - y * 0.01);
       },
       wheelHandler: (e: WheelEvent) => ({
-        x: 0,
-        y: -e.deltaY * 0.3 + e.deltaX * 0.3,
+        x: -e.deltaX * 0.3,
+        y: -e.deltaY * 0.3,
         z: 0
       }),
       preventDefault: true
@@ -98,6 +109,13 @@ const GraphPolygonView: FC<{
       player.setScroll(scroll);
     }
   }, [scroll]);
+
+  useEffect(() => {
+    const { current: player } = playerRef;
+    if (player) {
+      player.setGraphZoom(graphZoom);
+    }
+  }, [graphZoom]);
 
   return <div css={canvasStyle} ref={wrapperRef} />;
 };
