@@ -63,7 +63,7 @@ const GraphPolygonView: FC<{
       },
       wheelHandler: (e: WheelEvent) => ({
         x: 0,
-        y: -e.deltaY * 0.3,
+        y: -e.deltaY * 0.3 + e.deltaX * 0.3,
         z: 0
       }),
       preventDefault: true
