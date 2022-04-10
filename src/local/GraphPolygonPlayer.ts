@@ -140,7 +140,7 @@ export default class GraphPolygonPlayer implements CanvasPlayer {
       ctx.stroke();
       ctx.restore();
 
-      if (points.length > 1) {
+      if (points.length) {
         ctx.beginPath();
         points.forEach(({ x, y }, i) => {
           if (i) {
