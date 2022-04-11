@@ -1,11 +1,11 @@
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
 import * as express from "express";
-import { TWITTER_BEARER_TOKEN } from "./local/config";
+import { TWITTER_BEARER_TOKEN, INHOUSE_API_TOKEN } from "./local/config";
 import TwitterApiClient from "./local/TwitterApiClient";
 import { TwitterAccount } from "./sync/scheme/TwitterAccount";
 import { TwitterData } from "./sync/scheme/TwitterData";
-import { parseTwitterEntry, TwitterEntry } from "./sync/scheme/TwitterEntry";
+import { TwitterEntry } from "./sync/scheme/TwitterEntry";
 
 admin.initializeApp(functions.config().firebase);
 
@@ -106,6 +106,11 @@ const apiApp = express();
 
 apiApp.get("/tweet/:id", async (req, res) => {
   const { id } = req.params;
+  const { key } = req.query;
+  if (String(key) !== INHOUSE_API_TOKEN || !INHOUSE_API_TOKEN) {
+    res.status(400).send({ status: "ng", error: "api token is not valid." });
+    return;
+  }
   if (!id) {
     res.send({ status: "ng", error: "no id." });
     return;
