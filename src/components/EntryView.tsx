@@ -5,6 +5,7 @@ import { em, pcp, percent, px, spp } from "~/lib/cssUtil";
 import { MQ_DESKTOP, MQ_MOBILE } from "~/lib/MQ";
 import {
   buttonReset,
+  THEME_BG,
   THEME_GRAPH_BG,
   THEME_TOOLTIP_BG
 } from "~/local/commonCss";
@@ -78,6 +79,32 @@ const rightArrowStyle = css(arrowStyle, {
   justifyContent: "flex-end"
 });
 
+const reactionBaloonStyle = css({
+  position: "absolute",
+  right: percent(0),
+  bottom: percent(100),
+  padding: em(0.5),
+  marginBottom: em(0.8),
+  backgroundColor: THEME_BG,
+  fontSize: percent(80),
+  lineHeight: 1,
+  fontWeight: "bold",
+  strong: {
+    fontSize: percent(150)
+  },
+  "&:before": {
+    content: "''",
+    display: "block",
+    position: "absolute",
+    left: percent(50),
+    top: percent(100),
+    borderStyle: "solid",
+    borderColor: `${THEME_BG} transparent transparent transparent`,
+    borderWidth: em(0.5, 0.5, 0, 0.5),
+    marginLeft: em(-0.5)
+  }
+});
+
 const EntryView: FC<{
   name: string;
   focusIndex: number;
@@ -135,6 +162,12 @@ const EntryView: FC<{
       >
         <div css={mainTextStyle}>{entry.text}</div>
         <div css={dateStyle}>{date}</div>
+        {entry.likeCount || entry.retweetCount || entry.quoteCount ? (
+          <div css={reactionBaloonStyle}>
+            <strong>{entry.likeCount}</strong>&nbsp;like&nbsp;/&nbsp;
+            <strong>{entry.retweetCount + entry.quoteCount}</strong> RT
+          </div>
+        ) : null}
       </a>
       <button
         type="button"
