@@ -63,6 +63,7 @@ async function writeTwitterLogData(
         id: e.id,
         text: e.text,
         createdAt: e.created_at,
+        updatedAt: Date.now(),
         retweetCount: e.public_metrics.retweet_count,
         likeCount: e.public_metrics.like_count,
         replyCount: e.public_metrics.reply_count,

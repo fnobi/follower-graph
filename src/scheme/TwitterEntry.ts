@@ -2,6 +2,7 @@ export type TwitterEntry = {
   id: string;
   text: string;
   createdAt: string;
+  updatedAt: number;
   retweetCount: number;
   replyCount: number;
   likeCount: number;
@@ -14,6 +15,7 @@ export const parseTwitterEntry = (src: any): TwitterEntry => {
     id: String(src.id || ""),
     text: String(src.text || ""),
     createdAt: String(src.createdAt || ""),
+    updatedAt: Number(src.updatedAt),
     retweetCount: Number(src.retweetCount),
     replyCount: Number(src.replyCount),
     likeCount: Number(src.likeCount),
