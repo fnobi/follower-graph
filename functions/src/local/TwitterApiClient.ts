@@ -20,6 +20,17 @@ type TwitterEntryObject = {
   text:string;
   // eslint-disable-next-line camelcase
   created_at:string;
+  // eslint-disable-next-line camelcase
+  public_metrics: {
+    // eslint-disable-next-line camelcase
+    retweet_count: number,
+    // eslint-disable-next-line camelcase
+    reply_count: number,
+    // eslint-disable-next-line camelcase
+    like_count: number,
+    // eslint-disable-next-line camelcase
+    quote_count: number
+  },
 };
 
 export default class TwitterApiClient {
@@ -69,7 +80,7 @@ export default class TwitterApiClient {
       return this.callApi<{data: TwitterEntryObject[]}>(
           `/2/users/${id}/tweets`,
           {
-            "tweet.fields": "created_at",
+            "tweet.fields": "created_at,public_metrics",
             "exclude": "retweets,replies"
           }
       );

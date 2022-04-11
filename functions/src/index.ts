@@ -61,7 +61,11 @@ async function writeTwitterLogData(
       const ent: TwitterEntry = {
         id: e.id,
         text: e.text,
-        createdAt: e.created_at
+        createdAt: e.created_at,
+        retweetCount: e.public_metrics.retweet_count,
+        likeCount: e.public_metrics.like_count,
+        replyCount: e.public_metrics.reply_count,
+        quoteCount: e.public_metrics.quote_count
       };
       return entryDocumentRef(e.id).set(ent);
     })
