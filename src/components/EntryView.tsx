@@ -13,6 +13,20 @@ import { twitterEntryDocumentRef } from "~/local/database";
 import { formatDateTime } from "~/local/dateUtil";
 import { parseTwitterEntry, TwitterEntry } from "~/scheme/TwitterEntry";
 
+const roundNum = (n: number, count: number = 1) => {
+  return Math.floor(n * 10 ** count) / 10 ** count;
+};
+
+const normalizeBigNumber = (n: number) => {
+  if (n >= 10 ** 6) {
+    return `${roundNum(n / 10 ** 6)}M`;
+  }
+  if (n >= 10 ** 3) {
+    return `${roundNum(n / 10 ** 3)}K`;
+  }
+  return String(n);
+};
+
 const wrapperStyle = css({
   position: "relative",
   [MQ_MOBILE]: {
@@ -85,10 +99,19 @@ const reactionBaloonStyle = css({
   bottom: percent(100),
   padding: em(0.5),
   marginBottom: em(0.8),
+  maxWidth: em(9),
   backgroundColor: THEME_BG,
   fontSize: percent(80),
-  lineHeight: 1,
+  lineHeight: 1.1,
   fontWeight: "bold",
+  textAlign: "center",
+  span: {
+    display: "inline-block",
+    paddingRight: em(0.4),
+    "&:last-child": {
+      paddingRight: em(0)
+    }
+  },
   strong: {
     fontSize: percent(150)
   },
@@ -164,8 +187,15 @@ const EntryView: FC<{
         <div css={dateStyle}>{date}</div>
         {entry.likeCount || entry.retweetCount || entry.quoteCount ? (
           <div css={reactionBaloonStyle}>
-            <strong>{entry.likeCount}</strong>&nbsp;like&nbsp;/&nbsp;
-            <strong>{entry.retweetCount + entry.quoteCount}</strong> RT
+            <span>
+              <strong>{normalizeBigNumber(entry.likeCount)}</strong>&nbsp;like
+            </span>
+            <span>
+              <strong>
+                {normalizeBigNumber(entry.retweetCount + entry.quoteCount)}
+              </strong>
+              &nbsp;RT
+            </span>
           </div>
         ) : null}
       </a>
