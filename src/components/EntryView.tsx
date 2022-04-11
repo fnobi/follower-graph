@@ -5,12 +5,27 @@ import { em, pcp, percent, px, spp } from "~/lib/cssUtil";
 import { MQ_DESKTOP, MQ_MOBILE } from "~/lib/MQ";
 import {
   buttonReset,
+  THEME_BG,
   THEME_GRAPH_BG,
   THEME_TOOLTIP_BG
 } from "~/local/commonCss";
 import { twitterEntryDocumentRef } from "~/local/database";
 import { formatDateTime } from "~/local/dateUtil";
 import { parseTwitterEntry, TwitterEntry } from "~/scheme/TwitterEntry";
+
+const roundNum = (n: number, count: number = 1) => {
+  return Math.floor(n * 10 ** count) / 10 ** count;
+};
+
+const normalizeBigNumber = (n: number) => {
+  if (n >= 10 ** 6) {
+    return `${roundNum(n / 10 ** 6)}M`;
+  }
+  if (n >= 10 ** 3) {
+    return `${roundNum(n / 10 ** 3)}K`;
+  }
+  return String(n);
+};
 
 const wrapperStyle = css({
   position: "relative",
@@ -78,6 +93,41 @@ const rightArrowStyle = css(arrowStyle, {
   justifyContent: "flex-end"
 });
 
+const reactionBaloonStyle = css({
+  position: "absolute",
+  right: percent(0),
+  bottom: percent(100),
+  padding: em(0.5),
+  marginBottom: em(0.8),
+  maxWidth: em(9),
+  backgroundColor: THEME_BG,
+  fontSize: percent(80),
+  lineHeight: 1.1,
+  fontWeight: "bold",
+  textAlign: "center",
+  span: {
+    display: "inline-block",
+    paddingRight: em(0.4),
+    "&:last-child": {
+      paddingRight: em(0)
+    }
+  },
+  strong: {
+    fontSize: percent(150)
+  },
+  "&:before": {
+    content: "''",
+    display: "block",
+    position: "absolute",
+    left: percent(50),
+    top: percent(100),
+    borderStyle: "solid",
+    borderColor: `${THEME_BG} transparent transparent transparent`,
+    borderWidth: em(0.5, 0.5, 0, 0.5),
+    marginLeft: em(-0.5)
+  }
+});
+
 const EntryView: FC<{
   name: string;
   focusIndex: number;
@@ -135,6 +185,19 @@ const EntryView: FC<{
       >
         <div css={mainTextStyle}>{entry.text}</div>
         <div css={dateStyle}>{date}</div>
+        {entry.likeCount || entry.retweetCount || entry.quoteCount ? (
+          <div css={reactionBaloonStyle}>
+            <span>
+              <strong>{normalizeBigNumber(entry.likeCount)}</strong>&nbsp;like
+            </span>
+            <span>
+              <strong>
+                {normalizeBigNumber(entry.retweetCount + entry.quoteCount)}
+              </strong>
+              &nbsp;RT
+            </span>
+          </div>
+        ) : null}
       </a>
       <button
         type="button"
