@@ -3,3 +3,5 @@ node_modules
 .DS_Store
 yarn.lock
 next-env.d.ts
+functions-config.json
+firebase-debug.log
